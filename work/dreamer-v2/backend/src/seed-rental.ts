@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm';
 import configuration from './config/configuration';
 import { Studio } from './modules/rental/entities/studio.entity';
 import { TimeSlot } from './modules/rental/entities/time-slot.entity';
+import { RentalItem } from './modules/rental/entities/rental-item.entity';
 
 async function seedRental(): Promise<void> {
   const db = configuration().database as any;
@@ -14,7 +15,7 @@ async function seedRental(): Promise<void> {
     username: db.username,
     password: db.password,
     database: db.database,
-    entities: [Studio, TimeSlot],
+    entities: [Studio, TimeSlot, RentalItem],
     synchronize: true,
     charset: 'utf8mb4',
   });
@@ -49,6 +50,17 @@ async function seedRental(): Promise<void> {
     await slotRepo.save(slots.map((s) => slotRepo.create({ studioId: studio.id, ...s, enabled: true })));
   }
   console.log('Seed rental done: 2 studios, 16 time slots');
+
+  const itemRepo = ds.getRepository(RentalItem);
+  const existingItems = await itemRepo.find();
+  if (!existingItems.length) {
+    await itemRepo.save([
+      itemRepo.create({ name: '汉服·凤冠霞帔', billingType: 'day', unitPriceCents: 5000, depositCents: 20000, stock: 10, enabled: true, sort: 1 }),
+      itemRepo.create({ name: '单反相机', billingType: 'day', unitPriceCents: 8000, depositCents: 50000, stock: 5, enabled: true, sort: 2 }),
+      itemRepo.create({ name: 'LED 灯光套装', billingType: 'slot', unitPriceCents: 3000, depositCents: 30000, stock: 8, enabled: true, sort: 3 }),
+    ]);
+    console.log('Seed items done: 3 items');
+  }
   await ds.destroy();
 }
 
