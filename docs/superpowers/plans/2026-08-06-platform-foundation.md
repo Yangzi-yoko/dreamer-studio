@@ -38,7 +38,7 @@
 - Consumes: 无
 - Produces: 可通过 `npm run start:dev` 启动的 NestJS 空应用；npm 脚本 `test`、`build`、`start:dev` 可用
 
-- [ ] **Step 1: 生成 NestJS 项目**
+- [x] **Step 1: 生成 NestJS 项目**
 
 ```powershell
 New-Item -ItemType Directory -Force -Path 'C:\Users\97157\Documents\Codex\2026-08-06\lia\work\dreamer-v2'
@@ -48,7 +48,7 @@ npx --yes @nestjs/cli@10 new backend --package-manager npm --skip-git
 
 Expected: 生成 `backend/` 目录，内含标准 Nest 结构（src/main.ts、src/app.module.ts 等）。
 
-- [ ] **Step 2: 安装后端运行依赖**
+- [x] **Step 2: 安装后端运行依赖**
 
 ```powershell
 Set-Location 'C:\Users\97157\Documents\Codex\2026-08-06\lia\work\dreamer-v2\backend'
@@ -58,7 +58,7 @@ npm install -D @types/passport-jwt @types/bcryptjs
 
 Expected: `package.json` 中出现上述依赖；`npm install` 无报错。
 
-- [ ] **Step 3: 验证脚手架**
+- [x] **Step 3: 验证脚手架**
 
 ```powershell
 Set-Location 'C:\Users\97157\Documents\Codex\2026-08-06\lia\work\dreamer-v2\backend'
@@ -68,7 +68,7 @@ npm test
 
 Expected: build 成功；默认 `app.controller.spec.ts` 测试通过。
 
-- [ ] **Step 4: 提交（如环境可用 git）**
+- [x] **Step 4: 提交（如环境可用 git）**
 
 ```bash
 git add -A
@@ -94,7 +94,7 @@ git commit -m "chore: scaffold nestjs backend"
   - `RedisService`：`get<T>(key: string): Promise<T | null>`、`set(key: string, value: unknown, ttlSeconds?: number): Promise<void>`、`del(key: string): Promise<void>`；连接失败时静默降级（捕获异常不抛出），并导出 `RedisModule`
   - 全局 `ConfigModule`（isGlobal）提供 `process.env` 读取
 
-- [ ] **Step 1: 创建配置文件**
+- [x] **Step 1: 创建配置文件**
 
 Create `backend/src/config/configuration.ts`:
 
@@ -120,7 +120,7 @@ export default () => ({
 });
 ```
 
-- [ ] **Step 2: 创建 .env 模板与实际 .env**
+- [x] **Step 2: 创建 .env 模板与实际 .env**
 
 Create `backend/.env.example` and copy to `backend/.env`:
 
@@ -140,7 +140,7 @@ JWT_SECRET=dev-secret-please-rotate
 JWT_EXPIRES_IN=7d
 ```
 
-- [ ] **Step 3: 创建 Redis 服务与模块**
+- [x] **Step 3: 创建 Redis 服务与模块**
 
 Create `backend/src/common/redis/redis.service.ts`:
 
@@ -212,7 +212,7 @@ import { RedisService } from './redis.service';
 export class RedisModule {}
 ```
 
-- [ ] **Step 4: 编写 Redis 服务单元测试（先跑失败）**
+- [x] **Step 4: 编写 Redis 服务单元测试（先跑失败）**
 
 Create `backend/src/common/redis/redis.service.spec.ts`:
 
@@ -243,7 +243,7 @@ describe('RedisService', () => {
 
 Run: `npx jest src/common/redis/redis.service.spec.ts -t "degraded get"` — Expected: FAIL（`RedisService` 尚不存在或无法解析）。
 
-- [ ] **Step 5: 注册 ConfigModule / TypeORM / RedisModule 到根模块**
+- [x] **Step 5: 注册 ConfigModule / TypeORM / RedisModule 到根模块**
 
 Modify `backend/src/app.module.ts`:
 
@@ -281,17 +281,17 @@ import { RedisModule } from './common/redis/redis.module';
 export class AppModule {}
 ```
 
-- [ ] **Step 6: 运行测试验证通过**
+- [x] **Step 6: 运行测试验证通过**
 
 Run: `npx jest src/common/redis/redis.service.spec.ts -t "degraded get"`
 Expected: PASS。
 
-- [ ] **Step 7: 验证应用可编译**
+- [x] **Step 7: 验证应用可编译**
 
 Run: `npm run build`
 Expected: build 成功。
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```bash
 git add -A
@@ -320,7 +320,7 @@ git commit -m "feat: config, typeorm and redis wiring"
   - `AllExceptionsFilter`：统一输出 `{ code, message, timestamp, path }`；HttpException 使用其 status，BusinessException 使用其 code，其余 500
   - `LoggerMiddleware`：记录 `method url status duration(ms)`
 
-- [ ] **Step 1: 编写失败测试（响应拦截器）**
+- [x] **Step 1: 编写失败测试（响应拦截器）**
 
 Create `backend/src/common/interceptors/transform.interceptor.spec.ts`:
 
@@ -344,7 +344,7 @@ describe('TransformInterceptor', () => {
 
 Run: `npx jest src/common/interceptors/transform.interceptor.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 2: 实现响应拦截器**
+- [x] **Step 2: 实现响应拦截器**
 
 Create `backend/src/common/interceptors/transform.interceptor.ts`:
 
@@ -367,12 +367,12 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ApiResponse<T
 }
 ```
 
-- [ ] **Step 3: 运行测试验证通过**
+- [x] **Step 3: 运行测试验证通过**
 
 Run: `npx jest src/common/interceptors/transform.interceptor.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 4: 编写失败测试（业务异常）**
+- [x] **Step 4: 编写失败测试（业务异常）**
 
 Create `backend/src/common/exceptions/business.exception.spec.ts`:
 
@@ -395,7 +395,7 @@ describe('BusinessException', () => {
 
 Run: `npx jest src/common/exceptions/business.exception.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 5: 实现业务异常**
+- [x] **Step 5: 实现业务异常**
 
 Create `backend/src/common/exceptions/business.exception.ts`:
 
@@ -411,12 +411,12 @@ export class BusinessException extends Error {
 }
 ```
 
-- [ ] **Step 6: 运行测试验证通过**
+- [x] **Step 6: 运行测试验证通过**
 
 Run: `npx jest src/common/exceptions/business.exception.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 7: 编写失败测试（全局异常过滤器）**
+- [x] **Step 7: 编写失败测试（全局异常过滤器）**
 
 Create `backend/src/common/filters/all-exceptions.filter.spec.ts`:
 
@@ -456,7 +456,7 @@ describe('AllExceptionsFilter', () => {
 
 Run: `npx jest src/common/filters/all-exceptions.filter.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 8: 实现全局异常过滤器**
+- [x] **Step 8: 实现全局异常过滤器**
 
 Create `backend/src/common/filters/all-exceptions.filter.ts`:
 
@@ -493,12 +493,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
 }
 ```
 
-- [ ] **Step 9: 运行测试验证通过**
+- [x] **Step 9: 运行测试验证通过**
 
 Run: `npx jest src/common/filters/all-exceptions.filter.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 10: 实现请求日志中间件**
+- [x] **Step 10: 实现请求日志中间件**
 
 Create `backend/src/common/middleware/logger.middleware.ts`:
 
@@ -520,7 +520,7 @@ export class LoggerMiddleware implements NestMiddleware {
 }
 ```
 
-- [ ] **Step 11: 在 main.ts 中启用全局拦截器、过滤器、校验管道与日志**
+- [x] **Step 11: 在 main.ts 中启用全局拦截器、过滤器、校验管道与日志**
 
 Modify `backend/src/main.ts`:
 
@@ -547,12 +547,12 @@ bootstrap();
 
 注意：`app.setGlobalPrefix('api')` 后，所有接口路径以 `/api` 开头，与服务器 Nginx 现有转发规则保持一致。
 
-- [ ] **Step 12: 验证全部测试与构建**
+- [x] **Step 12: 验证全部测试与构建**
 
 Run: `npm test && npm run build`
 Expected: 全部通过。
 
-- [ ] **Step 13: 提交**
+- [x] **Step 13: 提交**
 
 ```bash
 git add -A
@@ -576,7 +576,7 @@ git commit -m "feat: unified response, exceptions and request logging"
   - `BaseService<T>`：`page(page, pageSize): Promise<PageResult<T>>`、`findOne(id: string | number): Promise<T>`（不存在抛 `BusinessException('记录不存在', 40400)`）、`create(dto: Partial<T>): Promise<T>`、`update(id, dto: Partial<T>): Promise<T>`、`remove(id): Promise<void>`
   - `BaseController<T>`：抽象类，提供 `GET /`（分页）、`GET /:id`、`POST /`、`PUT /:id`、`DELETE /:id`，子类通过 `@Controller()` 装饰
 
-- [ ] **Step 1: 编写失败测试（BaseService）**
+- [x] **Step 1: 编写失败测试（BaseService）**
 
 Create `backend/src/common/base/base.service.spec.ts`:
 
@@ -615,7 +615,7 @@ describe('BaseService', () => {
 
 Run: `npx jest src/common/base/base.service.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 2: 实现 BaseService 与 PageResult**
+- [x] **Step 2: 实现 BaseService 与 PageResult**
 
 Create `backend/src/common/base/page-result.ts`:
 
@@ -671,12 +671,12 @@ export class BaseService<T extends { id: any }> {
 }
 ```
 
-- [ ] **Step 3: 运行测试验证通过**
+- [x] **Step 3: 运行测试验证通过**
 
 Run: `npx jest src/common/base/base.service.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 4: 实现 BaseController 抽象类**
+- [x] **Step 4: 实现 BaseController 抽象类**
 
 Create `backend/src/common/base/base.controller.ts`:
 
@@ -718,12 +718,12 @@ export abstract class BaseController<T extends { id: any }> {
 
 注意：后续业务控制器若主键不是 int，需重写对应方法（本任务仅提供模板，不注册路由）。
 
-- [ ] **Step 5: 验证构建**
+- [x] **Step 5: 验证构建**
 
 Run: `npm run build`
 Expected: build 成功。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add -A
@@ -747,7 +747,7 @@ git commit -m "feat: base service and base controller"
   - `Role`：`id`、`code`(unique)、`name`、`description`、`createdAt`；`menus: Menu[]`（ManyToMany）；`admins: AdminUser[]`
   - `Menu`：`id`、`parentId`(nullable)、`title`、`path`、`icon`、`type`('dir'|'menu'|'button')、`permissionCode`(unique nullable)、`sort`、`visible`、`createdAt`
 
-- [ ] **Step 1: 编写失败测试（实体结构）**
+- [x] **Step 1: 编写失败测试（实体结构）**
 
 Create `backend/src/modules/system/entities/rbac.entity.spec.ts`:
 
@@ -774,7 +774,7 @@ describe('RBAC entities', () => {
 
 Run: `npx jest src/modules/system/entities/rbac.entity.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 2: 创建三个实体**
+- [x] **Step 2: 创建三个实体**
 
 Create `backend/src/modules/system/entities/admin-user.entity.ts`:
 
@@ -890,17 +890,17 @@ export class Menu {
 }
 ```
 
-- [ ] **Step 3: 运行测试验证通过**
+- [x] **Step 3: 运行测试验证通过**
 
 Run: `npx jest src/modules/system/entities/rbac.entity.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 4: 验证可编译**
+- [x] **Step 4: 验证可编译**
 
 Run: `npm run build`
 Expected: build 成功。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add -A
@@ -929,7 +929,7 @@ git commit -m "feat: rbac entities"
   - `JwtAuthGuard`：基于 `AuthGuard('jwt')` 的全局可用守卫
   - `@CurrentAdmin()` 装饰器：从 `req.user` 取出 `{ adminId: number; username: string; isSuper: boolean }`
 
-- [ ] **Step 1: 编写失败测试（AuthService）**
+- [x] **Step 1: 编写失败测试（AuthService）**
 
 Create `backend/src/modules/auth/auth.service.spec.ts`:
 
@@ -967,7 +967,7 @@ describe('AuthService', () => {
 
 Run: `npx jest src/modules/auth/auth.service.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 2: 实现 AuthService**
+- [x] **Step 2: 实现 AuthService**
 
 Create `backend/src/modules/auth/auth.service.ts`:
 
@@ -1005,12 +1005,12 @@ export class AuthService {
 }
 ```
 
-- [ ] **Step 3: 运行测试验证通过**
+- [x] **Step 3: 运行测试验证通过**
 
 Run: `npx jest src/modules/auth/auth.service.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 4: 创建 DTO、控制器、策略与守卫**
+- [x] **Step 4: 创建 DTO、控制器、策略与守卫**
 
 Create `backend/src/modules/auth/dto/login.dto.ts`:
 
@@ -1139,7 +1139,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthModule {}
 ```
 
-- [ ] **Step 5: 注册 AuthModule 到根模块**
+- [x] **Step 5: 注册 AuthModule 到根模块**
 
 Modify `backend/src/app.module.ts` imports 数组，加入 `AuthModule`：
 
@@ -1148,12 +1148,12 @@ import { AuthModule } from './modules/auth/auth.module';
 // imports: [ ..., AuthModule ]
 ```
 
-- [ ] **Step 6: 验证构建与测试**
+- [x] **Step 6: 验证构建与测试**
 
 Run: `npm test && npm run build`
 Expected: 全部通过。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 git add -A
@@ -1190,7 +1190,7 @@ git commit -m "feat: admin login with jwt"
   - `RoleService` / `MenuService`：CRUD，另提供 `assignMenus(roleId, menuIds)`
   - `GET /api/auth/menus` 在 AuthController 增加（转发到 AdminService.menusOf）
 
-- [ ] **Step 1: 编写失败测试（PermissionsGuard）**
+- [x] **Step 1: 编写失败测试（PermissionsGuard）**
 
 Create `backend/src/modules/system/permissions.guard.spec.ts`:
 
@@ -1227,7 +1227,7 @@ describe('PermissionsGuard', () => {
 
 Run: `npx jest src/modules/system/permissions.guard.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 2: 实现权限装饰器与守卫**
+- [x] **Step 2: 实现权限装饰器与守卫**
 
 Create `backend/src/modules/system/permissions.decorator.ts`:
 
@@ -1273,12 +1273,12 @@ export class PermissionsGuard implements CanActivate {
 
 注意：`PermissionsGuard` 在运行时注入 `AdminService`，两者同属 SystemModule，无同模块循环；真正的循环在 SystemModule 与 AuthModule 之间（互相引用对方 provider），由 Step 7 的 `forwardRef` 处理。
 
-- [ ] **Step 3: 运行测试验证通过**
+- [x] **Step 3: 运行测试验证通过**
 
 Run: `npx jest src/modules/system/permissions.guard.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 4: 实现 AdminService / RoleService / MenuService 与 DTO**
+- [x] **Step 4: 实现 AdminService / RoleService / MenuService 与 DTO**
 
 Create `backend/src/modules/system/dto/create-admin.dto.ts`:
 
@@ -1483,7 +1483,7 @@ import { BaseService } from '../../common/base/base.service';
 export class MenuService extends BaseService<Menu> {}
 ```
 
-- [ ] **Step 5: 编写失败测试（AdminService 超管限制）**
+- [x] **Step 5: 编写失败测试（AdminService 超管限制）**
 
 Create `backend/src/modules/system/admin.service.spec.ts`:
 
@@ -1511,12 +1511,12 @@ describe('AdminService', () => {
 
 Run: `npx jest src/modules/system/admin.service.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 6: 运行测试验证通过**
+- [x] **Step 6: 运行测试验证通过**
 
 Run: `npx jest src/modules/system/admin.service.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 7: 创建控制器与模块**
+- [x] **Step 7: 创建控制器与模块**
 
 Create `backend/src/modules/system/system.module.ts`:
 
@@ -1652,7 +1652,7 @@ export class MenuController extends BaseController<Menu> {
 }
 ```
 
-- [ ] **Step 8: 增加当前管理员菜单接口**
+- [x] **Step 8: 增加当前管理员菜单接口**
 
 Modify `backend/src/modules/auth/auth.controller.ts`，注入 `AdminService` 并增加 `GET /api/auth/menus`：
 
@@ -1687,16 +1687,16 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthModule {}
 ```
 
-- [ ] **Step 9: 注册 SystemModule 到根模块**
+- [x] **Step 9: 注册 SystemModule 到根模块**
 
 Modify `backend/src/app.module.ts`，加入 `SystemModule`。
 
-- [ ] **Step 10: 验证测试与构建**
+- [x] **Step 10: 验证测试与构建**
 
 Run: `npm test && npm run build`
 Expected: 全部通过。
 
-- [ ] **Step 11: 提交**
+- [x] **Step 11: 提交**
 
 ```bash
 git add -A
@@ -1718,7 +1718,7 @@ git commit -m "feat: rbac guards and system management services"
   - 基础菜单：仪表盘（`/dashboard`）、会员管理（dir）、租赁管理（dir）、系统管理（dir，含 管理员/角色/菜单 子菜单与按钮权限码 `system:*`）
   - 角色：`superadmin`（绑定全部菜单）
 
-- [ ] **Step 1: 编写 seed 脚本**
+- [x] **Step 1: 编写 seed 脚本**
 
 Create `backend/src/seed.ts`:
 
@@ -1810,7 +1810,7 @@ seed().catch((err) => {
 });
 ```
 
-- [ ] **Step 2: 增加 npm 脚本**
+- [x] **Step 2: 增加 npm 脚本**
 
 Modify `backend/package.json` scripts：
 
@@ -1880,7 +1880,7 @@ git commit -m "feat: seed super admin, roles and menus"
   - `useAuthStore`：`token`、`admin`、`menus`；`login()`、`loadProfile()`、`logout()`
   - 路由守卫：无 token 跳 `/login`；登录后从后端拉菜单并动态注册
 
-- [ ] **Step 1: 生成 Vite 项目并安装依赖**
+- [x] **Step 1: 生成 Vite 项目并安装依赖**
 
 ```powershell
 Set-Location 'C:\Users\97157\Documents\Codex\2026-08-06\lia\work\dreamer-v2'
@@ -1893,7 +1893,7 @@ npm install -D vitest @vue/test-utils jsdom
 
 Expected: `admin/` 目录生成且依赖安装完成。
 
-- [ ] **Step 2: 配置 Vite 代理与测试环境**
+- [x] **Step 2: 配置 Vite 代理与测试环境**
 
 Modify `admin/vite.config.ts`:
 
@@ -1934,7 +1934,7 @@ import router from './router';
 createApp(App).use(createPinia()).use(router).use(ElementPlus).mount('#app');
 ```
 
-- [ ] **Step 3: 编写失败测试（auth store）**
+- [x] **Step 3: 编写失败测试（auth store）**
 
 Create `admin/src/stores/auth.spec.ts`:
 
@@ -1964,7 +1964,7 @@ describe('auth store', () => {
 
 Run: `npx vitest run src/stores/auth.spec.ts` — Expected: FAIL。
 
-- [ ] **Step 4: 实现 api 封装与 store**
+- [x] **Step 4: 实现 api 封装与 store**
 
 Create `admin/src/api/request.ts`:
 
@@ -2063,12 +2063,12 @@ export const useAuthStore = defineStore('auth', {
 });
 ```
 
-- [ ] **Step 5: 运行测试验证通过**
+- [x] **Step 5: 运行测试验证通过**
 
 Run: `npx vitest run src/stores/auth.spec.ts`
 Expected: PASS。
 
-- [ ] **Step 6: 实现路由与布局**
+- [x] **Step 6: 实现路由与布局**
 
 Create `admin/src/router/index.ts`:
 
@@ -2189,7 +2189,7 @@ Create `admin/src/views/Dashboard.vue`：
 </template>
 ```
 
-- [ ] **Step 7: 验证构建**
+- [x] **Step 7: 验证构建**
 
 Run: `npm run build`
 Expected: build 成功。
