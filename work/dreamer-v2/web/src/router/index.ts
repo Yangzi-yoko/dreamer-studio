@@ -13,6 +13,12 @@ const router = createRouter({
       { path: 'studio/:id', name: 'StudioDetail', component: () => import('../views/studios/StudioDetail.vue') },
       { path: 'booking/:studioId', name: 'Booking', component: () => import('../views/studios/Booking.vue') },
       { path: 'orders', name: 'Orders', component: () => import('../views/orders/Orders.vue') },
+      { path: 'items', name: 'ItemList', component: () => import('../views/items/ItemList.vue') },
+      { path: 'item/:id', name: 'ItemDetail', component: () => import('../views/items/ItemDetail.vue') },
+      { path: 'item-rental/:itemId', name: 'ItemRent', component: () => import('../views/items/ItemRent.vue') },
+      { path: 'rentals', name: 'Rentals', component: () => import('../views/rentals/Rentals.vue') },
+      { path: 'activities', name: 'ActivityList', component: () => import('../views/activities/ActivityList.vue') },
+      { path: 'activity/:id', name: 'ActivityDetail', component: () => import('../views/activities/ActivityDetail.vue') },
     ]},
   ],
 });
