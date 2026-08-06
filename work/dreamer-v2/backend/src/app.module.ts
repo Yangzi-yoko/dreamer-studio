@@ -8,6 +8,7 @@ import { RedisModule } from './common/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SystemModule } from './modules/system/system.module';
 import { RentalModule } from './modules/rental/rental.module';
+import { MemberModule } from './modules/member/member.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RentalModule } from './modules/rental/rental.module';
     AuthModule,
     SystemModule,
     RentalModule,
+    MemberModule,
   ],
   controllers: [AppController],
   providers: [AppService],
