@@ -15,6 +15,9 @@ export class Member {
   @Column({ type: 'text', nullable: true })
   avatar?: string;
 
+  @Column({ length: 5, nullable: true })
+  birthday?: string;
+
   @Index()
   @Column({ name: 'level_id', type: 'int', nullable: true })
   levelId?: number;

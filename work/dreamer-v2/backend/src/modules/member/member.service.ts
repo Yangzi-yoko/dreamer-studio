@@ -43,6 +43,7 @@ export class MemberService extends BaseService<Member> {
       phone: dto.phone,
       nickname: dto.nickname,
       avatar: dto.avatar,
+      birthday: dto.birthday,
       levelId: dto.levelId,
       tags: dto.tagIds?.length ? await this.tagRepo.findBy({ id: In(dto.tagIds) }) : [],
     });
@@ -54,6 +55,7 @@ export class MemberService extends BaseService<Member> {
     Object.assign(member, {
       nickname: dto.nickname,
       avatar: dto.avatar,
+      birthday: dto.birthday,
       levelId: dto.levelId,
     });
     if (dto.tagIds) member.tags = await this.tagRepo.findBy({ id: In(dto.tagIds) });

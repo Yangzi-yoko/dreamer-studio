@@ -14,6 +14,10 @@ export class SaveMemberDto {
   avatar?: string;
 
   @IsOptional()
+  @Matches(/^\d{2}-\d{2}$/)
+  birthday?: string;
+
+  @IsOptional()
   @IsInt()
   levelId?: number;
 
