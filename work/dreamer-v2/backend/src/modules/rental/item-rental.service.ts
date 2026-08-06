@@ -87,4 +87,8 @@ export class ItemRentalService {
     });
     return { list, total, page, pageSize };
   }
+
+  async pageByPhone(phone: string): Promise<ItemRental[]> {
+    return this.rentalRepo.find({ where: { customerPhone: phone }, order: { createdAt: 'DESC' } });
+  }
 }

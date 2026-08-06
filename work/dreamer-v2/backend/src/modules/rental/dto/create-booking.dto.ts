@@ -25,4 +25,8 @@ export class CreateBookingDto {
   @IsOptional()
   @IsString()
   remark?: string;
+
+  @IsOptional()
+  @IsInt()
+  memberId?: number;
 }

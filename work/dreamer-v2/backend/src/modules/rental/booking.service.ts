@@ -106,6 +106,10 @@ export class BookingService {
     return { list, total, page, pageSize };
   }
 
+  async pageByPhone(phone: string): Promise<Booking[]> {
+    return this.bookingRepo.find({ where: { customerPhone: phone }, order: { createdAt: 'DESC' } });
+  }
+
   async calendar(studioId: number, month: string): Promise<any[]> {
     const [y, m] = month.split('-').map(Number);
     const first = new Date(y, m - 1, 1);

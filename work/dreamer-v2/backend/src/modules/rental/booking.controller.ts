@@ -18,6 +18,11 @@ export class BookingController {
     return this.bookingService.create(dto);
   }
 
+  @Get('my')
+  my(@Query('phone') phone: string) {
+    return this.bookingService.pageByPhone(phone);
+  }
+
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   @Permissions('rental:booking:list')

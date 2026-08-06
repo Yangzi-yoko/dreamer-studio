@@ -18,6 +18,11 @@ export class ItemRentalController {
     return this.itemRentalService.create(dto);
   }
 
+  @Get('my')
+  my(@Query('phone') phone: string) {
+    return this.itemRentalService.pageByPhone(phone);
+  }
+
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Get()
   @Permissions('rental:item-rental:list')

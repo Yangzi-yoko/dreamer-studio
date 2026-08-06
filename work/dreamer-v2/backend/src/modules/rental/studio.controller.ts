@@ -5,35 +5,35 @@ import { Permissions } from '../system/permissions.decorator';
 import { StudioService } from './studio.service';
 import { SaveStudioDto } from './dto/save-studio.dto';
 
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('rental/studios')
 export class StudioController {
   constructor(private readonly studioService: StudioService) {}
 
   @Get()
-  @Permissions('rental:studio:list')
   page(@Query('page') page = 1, @Query('pageSize') pageSize = 10) {
     return this.studioService.page(Number(page), Number(pageSize));
   }
 
   @Get(':id')
-  @Permissions('rental:studio:list')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.studioService.findOne(id);
   }
 
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post()
   @Permissions('rental:studio:create')
   create(@Body() dto: SaveStudioDto) {
     return this.studioService.create(dto);
   }
 
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Put(':id')
   @Permissions('rental:studio:update')
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: SaveStudioDto) {
     return this.studioService.update(id, dto);
   }
 
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Delete(':id')
   @Permissions('rental:studio:delete')
   async remove(@Param('id', ParseIntPipe) id: number) {

@@ -34,4 +34,8 @@ export class CreateItemRentalDto {
   @IsOptional()
   @IsString()
   remark?: string;
+
+  @IsOptional()
+  @IsInt()
+  memberId?: number;
 }

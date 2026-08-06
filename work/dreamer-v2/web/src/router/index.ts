@@ -9,6 +9,10 @@ const router = createRouter({
     { path: '/', component: () => import('../views/Layout.vue'), children: [
       { path: '', redirect: '/home' },
       { path: 'home', name: 'Home', component: () => import('../views/Home.vue') },
+      { path: 'studios', name: 'StudioList', component: () => import('../views/studios/StudioList.vue') },
+      { path: 'studio/:id', name: 'StudioDetail', component: () => import('../views/studios/StudioDetail.vue') },
+      { path: 'booking/:studioId', name: 'Booking', component: () => import('../views/studios/Booking.vue') },
+      { path: 'orders', name: 'Orders', component: () => import('../views/orders/Orders.vue') },
     ]},
   ],
 });
