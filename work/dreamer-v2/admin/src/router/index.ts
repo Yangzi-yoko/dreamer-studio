@@ -9,6 +9,11 @@ const routes: RouteRecordRaw[] = [
     { path: 'system/admin', name: 'SystemAdmin', component: () => import('../views/system/AdminList.vue') },
     { path: 'system/role', name: 'SystemRole', component: () => import('../views/system/RoleList.vue') },
     { path: 'system/menu', name: 'SystemMenu', component: () => import('../views/system/MenuList.vue') },
+    { path: 'rental/studios', name: 'StudioList', component: () => import('../views/rental/StudioList.vue') },
+    { path: 'rental/studio/:id', name: 'StudioForm', component: () => import('../views/rental/StudioForm.vue') },
+    { path: 'rental/studio/:id/slots', name: 'TimeSlotManage', component: () => import('../views/rental/TimeSlotManage.vue') },
+    { path: 'rental/bookings', name: 'BookingList', component: () => import('../views/rental/BookingList.vue') },
+    { path: 'rental/calendar', name: 'BookingCalendar', component: () => import('../views/rental/BookingCalendar.vue') },
   ]},
 ];
 
