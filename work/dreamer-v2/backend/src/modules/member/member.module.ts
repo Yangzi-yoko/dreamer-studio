@@ -40,11 +40,15 @@ import { ReferralRule } from './entities/referral-rule.entity';
 import { ReferralReward } from './entities/referral-reward.entity';
 import { MemberReferralService } from './member-referral.service';
 import { MemberReferralController } from './member-referral.controller';
+import { Activity } from './entities/activity.entity';
+import { ActivityRegistration } from './entities/activity-registration.entity';
+import { MemberActivityService } from './member-activity.service';
+import { MemberActivityController } from './member-activity.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController],
-  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration]), SystemModule],
+  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController],
+  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService],
   exports: [MemberService],
 })
 export class MemberModule {}
