@@ -27,6 +27,28 @@ describe('MemberService', () => {
     await expect(service.create({ phone: '13800000000', nickname: '张三' } as any)).rejects.toThrow('手机号已注册');
   });
 
+  it('create sets username and default password hash', async () => {
+    repo.findOneBy.mockResolvedValue(null);
+    const bcrypt = require('bcryptjs');
+    await service.create({ phone: '13800000000', nickname: '张三' } as any);
+    expect(repo.create).toHaveBeenCalledWith(expect.objectContaining({
+      phone: '13800000000',
+      username: '13800000000',
+      passwordHash: expect.any(String),
+    }));
+    expect(bcrypt.compareSync('123456', repo.create.mock.calls[0][0].passwordHash)).toBe(true);
+  });
+
+  it('update resets password when provided', async () => {
+    const member = { id: 1, phone: '13800000000', username: '13800000000', nickname: '张三', tags: [] };
+    repo.findOneBy.mockResolvedValue(member);
+    await service.update(1, { phone: '13800000000', password: 'newpass123' } as any);
+    expect(repo.save).toHaveBeenCalled();
+    const saved = repo.save.mock.calls[0][0];
+    expect(saved.username).toBe('13800000000');
+    expect(saved.passwordHash).not.toBeUndefined();
+  });
+
   it('addConsumption accumulates spend and orders', async () => {
     const member = { id: 1, phone: '13800000000', totalSpendCents: 10000, totalOrders: 1, levelId: 1, tags: [] };
     repo.findOneBy.mockResolvedValue(member);

@@ -31,14 +31,20 @@ describe('MemberAuthService', () => {
 
   it('login returns token for valid credentials', async () => {
     const bcrypt = require('bcryptjs');
-    memberRepo.findOneBy.mockResolvedValue({ id: 1, phone: '13800000001', username: 'user1', nickname: '示例会员A', passwordHash: bcrypt.hashSync('pass123', 10) });
+    memberRepo.findOneBy.mockResolvedValue({ id: 1, phone: '13800000001', username: 'user1', nickname: '示例会员A', status: 1, passwordHash: bcrypt.hashSync('pass123', 10) });
     const res = await service.login('user1', 'pass123');
     expect(res.accessToken).toBe('member-token');
   });
 
   it('login rejects wrong password', async () => {
     const bcrypt = require('bcryptjs');
-    memberRepo.findOneBy.mockResolvedValue({ id: 1, phone: '13800000001', username: 'user1', nickname: '示例会员A', passwordHash: bcrypt.hashSync('pass123', 10) });
+    memberRepo.findOneBy.mockResolvedValue({ id: 1, phone: '13800000001', username: 'user1', nickname: '示例会员A', status: 1, passwordHash: bcrypt.hashSync('pass123', 10) });
     await expect(service.login('user1', 'wrong')).rejects.toThrow('账号或密码错误');
+  });
+
+  it('login rejects disabled member', async () => {
+    const bcrypt = require('bcryptjs');
+    memberRepo.findOneBy.mockResolvedValue({ id: 1, phone: '13800000001', username: 'user1', nickname: '示例会员A', status: 0, passwordHash: bcrypt.hashSync('pass123', 10) });
+    await expect(service.login('user1', 'pass123')).rejects.toThrow('账号已禁用');
   });
 });

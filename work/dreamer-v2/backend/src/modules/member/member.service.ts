@@ -9,6 +9,7 @@ import { Member } from './entities/member.entity';
 import { MemberLevel } from './entities/member-level.entity';
 import { MemberTag } from './entities/member-tag.entity';
 import { SaveMemberDto } from './dto/save-member.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class MemberService extends BaseService<Member> {
@@ -39,8 +40,13 @@ export class MemberService extends BaseService<Member> {
   async create(dto: SaveMemberDto): Promise<any> {
     const exists = await this.repo.findOneBy({ phone: dto.phone });
     if (exists) throw new BusinessException('手机号已注册', 40030);
+    const username = dto.username?.trim() || dto.phone;
+    const existsUser = await this.repo.findOneBy({ username });
+    if (existsUser) throw new BusinessException('账号已存在', 40031);
     const member = this.repo.create({
       phone: dto.phone,
+      username,
+      passwordHash: bcrypt.hashSync(dto.password || '123456', 10),
       nickname: dto.nickname,
       avatar: dto.avatar,
       birthday: dto.birthday,
@@ -58,6 +64,14 @@ export class MemberService extends BaseService<Member> {
       birthday: dto.birthday,
       levelId: dto.levelId,
     });
+    if (dto.username !== undefined && dto.username !== member.username) {
+      const username = dto.username.trim() || member.phone;
+      const existsUser = await this.repo.findOneBy({ username });
+      if (existsUser && existsUser.id !== member.id) throw new BusinessException('账号已存在', 40031);
+      member.username = username;
+    }
+    if (dto.password) member.passwordHash = bcrypt.hashSync(dto.password, 10);
+    if (dto.status !== undefined) member.status = dto.status;
     if (dto.tagIds) member.tags = await this.tagRepo.findBy({ id: In(dto.tagIds) });
     return this.toPublic(await this.repo.save(member));
   }
@@ -83,8 +97,10 @@ export class MemberService extends BaseService<Member> {
     return {
       id: m.id,
       phone: m.phone,
+      username: m.username,
       nickname: m.nickname,
       avatar: m.avatar,
+      birthday: m.birthday,
       levelId: m.levelId,
       totalSpend: toYuan(m.totalSpendCents),
       totalOrders: m.totalOrders,

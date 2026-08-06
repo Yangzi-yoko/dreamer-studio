@@ -49,6 +49,9 @@ export class MemberAuthService {
     if (!member || !bcrypt.compareSync(password, member.passwordHash)) {
       throw new BusinessException('账号或密码错误', 40100);
     }
+    if (member.status !== 1) {
+      throw new BusinessException('账号已禁用', 40101);
+    }
     return { accessToken: this.sign(member), member: { id: member.id, phone: member.phone, username: member.username, nickname: member.nickname } };
   }
 }
