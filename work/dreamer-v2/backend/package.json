@@ -14,6 +14,7 @@
     "start:prod": "node dist/main",
     "seed": "ts-node src/seed.ts",
     "seed:rental": "ts-node src/seed-rental.ts",
+    "seed:member": "ts-node src/seed-member.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
