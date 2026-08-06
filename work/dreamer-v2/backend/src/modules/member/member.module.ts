@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SystemModule } from '../system/system.module';
 import { Member } from './entities/member.entity';
 import { MemberLevel } from './entities/member-level.entity';
 import { MemberTag } from './entities/member-tag.entity';
@@ -11,7 +12,7 @@ import { MemberTagService } from './member-tag.service';
 import { MemberTagController } from './member-tag.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag])],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag]), SystemModule],
   controllers: [MemberController, MemberLevelController, MemberTagController],
   providers: [MemberService, MemberLevelService, MemberTagService],
   exports: [MemberService],
