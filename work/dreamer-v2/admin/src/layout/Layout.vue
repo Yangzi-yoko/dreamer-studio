@@ -6,7 +6,7 @@ import { useAuthStore } from '../stores/auth';
 const store = useAuthStore();
 const router = useRouter();
 
-const menus = computed(() => store.menus.filter((m) => m.type !== 'button'));
+const menus = computed(() => store.menus.filter((m) => m.type === 'menu'));
 
 function logout() {
   store.logout();
