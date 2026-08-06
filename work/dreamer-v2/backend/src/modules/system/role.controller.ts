@@ -1,16 +1,29 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from './permissions.guard';
 import { Permissions } from './permissions.decorator';
 import { RoleService } from './role.service';
 import { Role } from './entities/role.entity';
 import { BaseController } from '../../common/base/base.controller';
+import { PageResult } from '../../common/base/page-result';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('system/roles')
 export class RoleController extends BaseController<Role> {
   constructor(private readonly roleService: RoleService) {
     super(roleService);
+  }
+
+  @Get()
+  @Permissions('system:role:list')
+  page(@Query('page') page = 1, @Query('pageSize') pageSize = 10): Promise<PageResult<Role>> {
+    return super.page(page, pageSize);
+  }
+
+  @Get(':id')
+  @Permissions('system:role:list')
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Role> {
+    return super.findOne(id);
   }
 
   @Post()

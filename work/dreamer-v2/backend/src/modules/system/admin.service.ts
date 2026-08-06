@@ -34,15 +34,13 @@ export class AdminService extends BaseService<AdminUser> {
     return safe;
   }
 
-  async page(page = 1, pageSize = 10): Promise<PageResult<AdminUser>> {
+  async page<TReturn = SafeAdmin>(page = 1, pageSize = 10): Promise<PageResult<TReturn>> {
     const [list, total] = await this.repo.findAndCount({
       take: pageSize,
       skip: (page - 1) * pageSize,
       order: { createdAt: 'DESC' } as any,
     });
-    // BaseService's generic return type cannot express the stripped shape;
-    // runtime objects never include passwordHash.
-    return { list: list.map((admin) => this.toSafeAdmin(admin) as AdminUser), total, page, pageSize };
+    return { list: list.map((admin) => this.toSafeAdmin(admin)) as unknown as TReturn[], total, page, pageSize };
   }
 
   async createAdmin(operator: { isSuper: boolean }, dto: CreateAdminDto): Promise<SafeAdmin> {

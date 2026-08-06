@@ -41,6 +41,7 @@ async function seed(): Promise<void> {
     { key: 'system-admin-create', title: '新增管理员', type: 'button', permissionCode: 'system:admin:create', sort: 1, parent: 'system' },
     { key: 'system-admin-assign-role', title: '分配角色', type: 'button', permissionCode: 'system:admin:assign-role', sort: 2, parent: 'system' },
     { key: 'system-admin-delete', title: '删除管理员', type: 'button', permissionCode: 'system:admin:delete', sort: 3, parent: 'system' },
+    { key: 'system-admin-toggle-status', title: '启用/禁用管理员', type: 'button', permissionCode: 'system:admin:toggle-status', sort: 4, parent: 'system' },
     { key: 'system-role', title: '角色管理', path: '/system/role', type: 'menu', permissionCode: 'system:role:list', sort: 2, parent: 'system' },
     { key: 'system-role-assign-menu', title: '角色授权', type: 'button', permissionCode: 'system:role:assign-menu', sort: 1, parent: 'system' },
     { key: 'system-role-create', title: '新增角色', type: 'button', permissionCode: 'system:role:create', sort: 2, parent: 'system' },
@@ -52,36 +53,70 @@ async function seed(): Promise<void> {
     { key: 'system-menu-delete', title: '删除菜单', type: 'button', permissionCode: 'system:menu:delete', sort: 6, parent: 'system' },
   ];
 
+  const keyByPermissionCode = new Map(menuDefs.map((d) => [d.permissionCode, d.key]));
+  const existingMenus = await menuRepo.find();
+  const menuByKey = new Map<string, Menu>();
+  for (const menu of existingMenus) {
+    const key = menu.permissionCode ? keyByPermissionCode.get(menu.permissionCode) : undefined;
+    if (key) menuByKey.set(key, menu);
+  }
+
   const saved: Menu[] = [];
   for (const def of menuDefs) {
-    const parent = def.parent ? saved.find((m) => (m as any).key === def.parent) : undefined;
-    const menu = menuRepo.create({
-      title: def.title,
-      path: def.path || undefined,
-      type: def.type as any,
-      permissionCode: def.permissionCode,
-      sort: def.sort,
-      parentId: parent?.id,
-    });
-    (menu as any).key = def.key;
-    saved.push(await menuRepo.save(menu));
+    const parent = def.parent ? menuByKey.get(def.parent) : undefined;
+    let menu = menuByKey.get(def.key);
+    if (!menu) {
+      menu = menuRepo.create({
+        title: def.title,
+        path: def.path || undefined,
+        type: def.type as any,
+        permissionCode: def.permissionCode,
+        sort: def.sort,
+        parentId: parent?.id,
+      });
+    } else {
+      menu.title = def.title;
+      menu.path = def.path || undefined;
+      menu.type = def.type as any;
+      menu.permissionCode = def.permissionCode;
+      menu.sort = def.sort;
+      menu.parentId = parent?.id;
+    }
+    menuByKey.set(def.key, await menuRepo.save(menu));
+    saved.push(menuByKey.get(def.key)!);
   }
 
   const roleRepo = dataSource.getRepository(Role);
-  const role = await roleRepo.save(roleRepo.create({ code: 'superadmin', name: '超级管理员', description: '全部权限', menus: saved }));
+  let role = await roleRepo.findOneBy({ code: 'superadmin' });
+  if (role) {
+    role.name = '超级管理员';
+    role.description = '全部权限';
+    role.menus = saved;
+    role = await roleRepo.save(role);
+  } else {
+    role = await roleRepo.save(roleRepo.create({ code: 'superadmin', name: '超级管理员', description: '全部权限', menus: saved }));
+  }
 
   const adminRepo = dataSource.getRepository(AdminUser);
-  await adminRepo.save(
-    adminRepo.create({
-      username: 'admin',
-      passwordHash: bcrypt.hashSync('admin123', 10),
-      nickname: '超级管理员',
-      isSuper: true,
-      roles: [role],
-    }),
-  );
+  let admin = await adminRepo.findOneBy({ username: 'admin' });
+  if (admin) {
+    admin.nickname = '超级管理员';
+    admin.isSuper = true;
+    admin.roles = [role];
+    await adminRepo.save(admin);
+  } else {
+    await adminRepo.save(
+      adminRepo.create({
+        username: 'admin',
+        passwordHash: bcrypt.hashSync('admin123', 10),
+        nickname: '超级管理员',
+        isSuper: true,
+        roles: [role],
+      }),
+    );
+  }
 
-  console.log('Seed done: admin/admin123');
+  console.log('Seed done (idempotent): admin/admin123 on first run; existing admin password preserved');
   await dataSource.destroy();
 }
 

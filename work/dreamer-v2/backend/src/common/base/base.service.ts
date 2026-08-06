@@ -5,13 +5,13 @@ import { PageResult } from './page-result';
 export class BaseService<T extends { id: any }> {
   constructor(protected readonly repo: Repository<T>) {}
 
-  async page(page = 1, pageSize = 10): Promise<PageResult<T>> {
+  async page<TReturn = T>(page = 1, pageSize = 10): Promise<PageResult<TReturn>> {
     const [list, total] = await this.repo.findAndCount({
       take: pageSize,
       skip: (page - 1) * pageSize,
       order: { createdAt: 'DESC' } as any,
     });
-    return { list, total, page, pageSize };
+    return { list: list as unknown as TReturn[], total, page, pageSize };
   }
 
   async findOne(id: any): Promise<T> {

@@ -29,4 +29,20 @@ describe('AllExceptionsFilter', () => {
     const json = host.switchToHttp().getResponse().json as jest.Mock;
     expect(json).toHaveBeenCalledWith(expect.objectContaining({ code: 401, message: '未授权' }));
   });
+
+  it('joins validation messages from HttpException response body', () => {
+    const filter = new AllExceptionsFilter();
+    const host = buildHost(400, {});
+    filter.catch(
+      new HttpException(
+        { statusCode: 400, message: ['用户名不能为空', '密码不能为空'], error: 'Bad Request' },
+        HttpStatus.BAD_REQUEST,
+      ),
+      host,
+    );
+    const json = host.switchToHttp().getResponse().json as jest.Mock;
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 400, message: '用户名不能为空; 密码不能为空' }),
+    );
+  });
 });

@@ -43,7 +43,7 @@ export class AdminController {
   }
 
   @Put(':id/status')
-  @Permissions('system:admin:list')
+  @Permissions('system:admin:toggle-status')
   toggleStatus(
     @CurrentAdmin() operator: CurrentAdminPayload,
     @Param('id', ParseIntPipe) id: number,
