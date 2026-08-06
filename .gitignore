@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Old project copy (not part of the rewrite)
+work/wwwroot/
+
+# SDD scratch workspace
+.superpowers/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Runtime
+*.pid
+*.seed
