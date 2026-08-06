@@ -13,7 +13,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  validate(payload: { sub: number; username: string; isSuper: boolean }): { adminId: number; username: string; isSuper: boolean } {
-    return { adminId: payload.sub, username: payload.username, isSuper: payload.isSuper };
+  validate(payload: { sub: number; username: string; isSuper: boolean; type?: string }): {
+    adminId: number;
+    username?: string;
+    isSuper?: boolean;
+    type?: string;
+    sub: number;
+  } {
+    return { adminId: payload.sub, username: payload.username, isSuper: payload.isSuper, type: payload.type, sub: payload.sub };
   }
 }
