@@ -13,11 +13,14 @@ import { BookingService } from './booking.service';
 import { BookingController } from './booking.controller';
 import { BookingLifecycleService } from './booking-lifecycle.service';
 import { CalendarController } from './calendar.controller';
+import { RentalItem } from './entities/rental-item.entity';
+import { RentalItemService } from './rental-item.service';
+import { RentalItemController } from './rental-item.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot]), SystemModule],
-  controllers: [StudioController, TimeSlotController, BookingController, CalendarController],
-  providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService],
+  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem]), SystemModule],
+  controllers: [StudioController, TimeSlotController, BookingController, CalendarController, RentalItemController],
+  providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService],
   exports: [StudioService],
 })
 export class RentalModule {}
