@@ -16,13 +16,19 @@ export class AdminController {
 
   @Get()
   @Permissions('system:admin:list')
-  page(@Query('page') page = 1, @Query('pageSize') pageSize = 10): Promise<PageResult<AdminUser>> {
+  page(
+    @Query('page') page = 1,
+    @Query('pageSize') pageSize = 10,
+  ): Promise<PageResult<Omit<AdminUser, 'passwordHash'>>> {
     return this.adminService.page(Number(page), Number(pageSize));
   }
 
   @Post()
   @Permissions('system:admin:create')
-  create(@CurrentAdmin() operator: CurrentAdminPayload, @Body() dto: CreateAdminDto): Promise<AdminUser> {
+  create(
+    @CurrentAdmin() operator: CurrentAdminPayload,
+    @Body() dto: CreateAdminDto,
+  ): Promise<Omit<AdminUser, 'passwordHash'>> {
     return this.adminService.createAdmin(operator, dto);
   }
 
@@ -32,7 +38,7 @@ export class AdminController {
     @CurrentAdmin() operator: CurrentAdminPayload,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: AssignRolesDto,
-  ): Promise<AdminUser> {
+  ): Promise<Omit<AdminUser, 'passwordHash'>> {
     return this.adminService.assignRoles(operator, id, dto.roleIds);
   }
 
@@ -41,7 +47,7 @@ export class AdminController {
   toggleStatus(
     @CurrentAdmin() operator: CurrentAdminPayload,
     @Param('id', ParseIntPipe) id: number,
-  ): Promise<AdminUser> {
+  ): Promise<Omit<AdminUser, 'passwordHash'>> {
     return this.adminService.toggleStatus(operator, id);
   }
 

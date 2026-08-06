@@ -43,7 +43,13 @@ async function seed(): Promise<void> {
     { key: 'system-admin-delete', title: '删除管理员', type: 'button', permissionCode: 'system:admin:delete', sort: 3, parent: 'system' },
     { key: 'system-role', title: '角色管理', path: '/system/role', type: 'menu', permissionCode: 'system:role:list', sort: 2, parent: 'system' },
     { key: 'system-role-assign-menu', title: '角色授权', type: 'button', permissionCode: 'system:role:assign-menu', sort: 1, parent: 'system' },
+    { key: 'system-role-create', title: '新增角色', type: 'button', permissionCode: 'system:role:create', sort: 2, parent: 'system' },
+    { key: 'system-role-update', title: '编辑角色', type: 'button', permissionCode: 'system:role:update', sort: 3, parent: 'system' },
+    { key: 'system-role-delete', title: '删除角色', type: 'button', permissionCode: 'system:role:delete', sort: 4, parent: 'system' },
     { key: 'system-menu', title: '菜单管理', path: '/system/menu', type: 'menu', permissionCode: 'system:menu:list', sort: 3, parent: 'system' },
+    { key: 'system-menu-create', title: '新增菜单', type: 'button', permissionCode: 'system:menu:create', sort: 4, parent: 'system' },
+    { key: 'system-menu-update', title: '编辑菜单', type: 'button', permissionCode: 'system:menu:update', sort: 5, parent: 'system' },
+    { key: 'system-menu-delete', title: '删除菜单', type: 'button', permissionCode: 'system:menu:delete', sort: 6, parent: 'system' },
   ];
 
   const saved: Menu[] = [];

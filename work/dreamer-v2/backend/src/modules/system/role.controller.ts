@@ -1,4 +1,4 @@
-import { Body, Controller, Param, ParseIntPipe, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from './permissions.guard';
 import { Permissions } from './permissions.decorator';
@@ -11,6 +11,24 @@ import { BaseController } from '../../common/base/base.controller';
 export class RoleController extends BaseController<Role> {
   constructor(private readonly roleService: RoleService) {
     super(roleService);
+  }
+
+  @Post()
+  @Permissions('system:role:create')
+  create(@Body() dto: Partial<Role>): Promise<Role> {
+    return super.create(dto);
+  }
+
+  @Put(':id')
+  @Permissions('system:role:update')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: Partial<Role>): Promise<Role> {
+    return super.update(id, dto);
+  }
+
+  @Delete(':id')
+  @Permissions('system:role:delete')
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<{ id: number }> {
+    return super.remove(id);
   }
 
   @Put(':id/menus')
