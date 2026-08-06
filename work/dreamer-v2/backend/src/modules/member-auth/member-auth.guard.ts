@@ -1,18 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class MemberAuthGuard extends AuthGuard('jwt') {
   handleRequest<TUser = any>(err: any, user: any): TUser {
-    if (err || !user) {
-      throw err || new Error('???');
+    if (err || !user || user.type !== 'member') {
+      throw err || new UnauthorizedException('未登录或登录已过期');
     }
-    if (user.type === 'member') {
-      return { memberId: user.sub } as TUser;
-    }
-    if (user.username) {
-      return { adminId: user.sub, username: user.username } as TUser;
-    }
-    throw new Error('???');
+    return { memberId: user.sub } as TUser;
   }
 }
