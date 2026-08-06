@@ -14,6 +14,9 @@ const routes: RouteRecordRaw[] = [
     { path: 'rental/studio/:id/slots', name: 'TimeSlotManage', component: () => import('../views/rental/TimeSlotManage.vue') },
     { path: 'rental/bookings', name: 'BookingList', component: () => import('../views/rental/BookingList.vue') },
     { path: 'rental/calendar', name: 'BookingCalendar', component: () => import('../views/rental/BookingCalendar.vue') },
+    { path: 'rental/items', name: 'ItemList', component: () => import('../views/rental/ItemList.vue') },
+    { path: 'rental/item/:id', name: 'ItemForm', component: () => import('../views/rental/ItemForm.vue') },
+    { path: 'rental/item-rentals', name: 'ItemRentalList', component: () => import('../views/rental/ItemRentalList.vue') },
   ]},
 ];
 

@@ -12,4 +12,11 @@ export const rentalApi = {
   bookingPage: (params: any) => request.get<any, any>('/rental/bookings', { params }),
   bookingAction: (id: number, action: string) => request.post<any, any>(`/rental/bookings/${id}/${action}`),
   calendar: (studioId: number, month: string) => request.get<any, any[]>(`/rental/studios/${studioId}/calendar`, { params: { month } }),
+
+  itemPage: (page: number, pageSize: number) => request.get<any, any>('/rental/items', { params: { page, pageSize } }),
+  createItem: (data: any) => request.post<any, any>('/rental/items', data),
+  updateItem: (id: number, data: any) => request.put<any, any>(`/rental/items/${id}`, data),
+  deleteItem: (id: number) => request.delete<any, any>(`/rental/items/${id}`),
+  itemRentalPage: (params: any) => request.get<any, any>('/rental/item-rentals', { params }),
+  itemRentalAction: (id: number, action: string, data?: any) => request.post<any, any>(`/rental/item-rentals/${id}/${action}`, data || {}),
 };
