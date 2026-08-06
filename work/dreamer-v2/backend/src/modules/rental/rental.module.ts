@@ -19,11 +19,12 @@ import { RentalItemService } from './rental-item.service';
 import { RentalItemController } from './rental-item.controller';
 import { ItemRentalService } from './item-rental.service';
 import { ItemRentalController } from './item-rental.controller';
+import { ItemRentalLifecycleService } from './item-rental-lifecycle.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental]), SystemModule],
   controllers: [StudioController, TimeSlotController, BookingController, CalendarController, RentalItemController, ItemRentalController],
-  providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService, ItemRentalService],
+  providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService, ItemRentalService, ItemRentalLifecycleService],
   exports: [StudioService],
 })
 export class RentalModule {}
