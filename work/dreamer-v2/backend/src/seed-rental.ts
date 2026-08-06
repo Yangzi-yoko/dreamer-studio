@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import configuration from '../src/config/configuration';
-import { Studio } from '../src/modules/rental/entities/studio.entity';
-import { TimeSlot } from '../src/modules/rental/entities/time-slot.entity';
+import configuration from './config/configuration';
+import { Studio } from './modules/rental/entities/studio.entity';
+import { TimeSlot } from './modules/rental/entities/time-slot.entity';
 
 async function seedRental(): Promise<void> {
   const db = configuration().database as any;
