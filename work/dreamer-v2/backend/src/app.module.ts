@@ -9,6 +9,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { SystemModule } from './modules/system/system.module';
 import { RentalModule } from './modules/rental/rental.module';
 import { MemberModule } from './modules/member/member.module';
+import { MemberAuthModule } from './modules/member-auth/member-auth.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MemberModule } from './modules/member/member.module';
     SystemModule,
     RentalModule,
     MemberModule,
+    MemberAuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
