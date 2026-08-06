@@ -29,7 +29,7 @@ export class Member {
   status!: number;
 
   @ManyToMany(() => MemberTag, (tag) => tag.members)
-  @JoinTable({ name: 'member_tag' })
+  @JoinTable({ name: 'member_tag_relation' })
   tags!: MemberTag[];
 
   @CreateDateColumn({ name: 'created_at' })
