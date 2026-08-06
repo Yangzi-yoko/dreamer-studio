@@ -28,11 +28,14 @@ import { UserCoupon } from './entities/user-coupon.entity';
 import { CouponUsage } from './entities/coupon-usage.entity';
 import { MemberCouponService } from './member-coupon.service';
 import { MemberCouponController } from './member-coupon.controller';
+import { SigninLog } from './entities/signin-log.entity';
+import { MemberSigninService } from './member-signin.service';
+import { MemberSigninController } from './member-signin.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController],
-  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog]), SystemModule],
+  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController],
+  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService],
   exports: [MemberService],
 })
 export class MemberModule {}
