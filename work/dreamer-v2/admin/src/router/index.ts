@@ -17,6 +17,10 @@ const routes: RouteRecordRaw[] = [
     { path: 'rental/items', name: 'ItemList', component: () => import('../views/rental/ItemList.vue') },
     { path: 'rental/item/:id', name: 'ItemForm', component: () => import('../views/rental/ItemForm.vue') },
     { path: 'rental/item-rentals', name: 'ItemRentalList', component: () => import('../views/rental/ItemRentalList.vue') },
+    { path: 'member/members', name: 'MemberList', component: () => import('../views/member/MemberList.vue') },
+    { path: 'member/levels', name: 'LevelManage', component: () => import('../views/member/LevelManage.vue') },
+    { path: 'member/tags', name: 'TagManage', component: () => import('../views/member/TagManage.vue') },
+    { path: 'member/:id', name: 'MemberDetail', component: () => import('../views/member/MemberDetail.vue') },
   ]},
 ];
 
