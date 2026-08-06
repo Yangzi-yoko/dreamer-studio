@@ -74,4 +74,31 @@ describe('BookingService', () => {
     expect(cal[0].bookings[0].timeSlotIds).toEqual([11]);
     expect(cal[1].occupiedTimeSlotIds).toEqual([21]);
   });
+
+  it('treats completed bookings as occupying the slot', async () => {
+    studioRepo.findOneBy.mockResolvedValue({
+      id: 1,
+      weekdayPriceCents: 10000,
+      weekendPriceCents: 15000,
+      holidayPriceCents: 20000,
+      depositCents: 5000,
+    });
+    slotRepo.findBy.mockResolvedValue([{ id: 1, startTime: '09:00', endTime: '10:00' }]);
+    const occupied: any = {
+      find: jest.fn().mockResolvedValue([{ bookingId: 99, timeSlotId: 1 }]),
+      findBy: jest.fn().mockResolvedValue([{ id: 99, bookingDate: '2026-10-01', status: 'completed' }]),
+      create: jest.fn((_e: any, d: any) => d),
+      save: jest.fn(async (e: any) => e),
+    };
+    const dataSourceOcc: any = { transaction: jest.fn(async (fn: any) => fn(occupied)) };
+    const service3 = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, dataSourceOcc, redis);
+    const dto = {
+      studioId: 1,
+      customerName: '张三',
+      customerPhone: '13800000000',
+      bookingDate: '2026-10-01',
+      timeSlotIds: [1],
+    };
+    await expect(service3.create(dto as any)).rejects.toThrow('该时段已被预订');
+  });
 });

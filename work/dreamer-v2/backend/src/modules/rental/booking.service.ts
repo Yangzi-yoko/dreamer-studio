@@ -52,7 +52,7 @@ export class BookingService {
           const bookings = await manager.findBy(Booking, {
             id: In(bookingIds),
             bookingDate: dto.bookingDate,
-            status: In(['pending', 'paid', 'checked']),
+            status: In(['pending', 'paid', 'checked', 'completed']),
           });
           if (bookings.length) throw new BusinessException('该时段已被预订', 40900);
         }
