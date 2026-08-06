@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { MemberAuthGuard } from '../member-auth/member-auth.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
@@ -17,8 +18,8 @@ export class MemberCouponController {
     return this.couponService.pageCoupons(Number(page), Number(pageSize));
   }
 
+  @UseGuards(MemberAuthGuard)
   @Get('users')
-  @Permissions('member:coupon:list')
   users(@Query('memberId', ParseIntPipe) memberId: number) {
     return this.couponService.pageUserCoupons(memberId);
   }

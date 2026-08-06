@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { MemberAuthGuard } from '../member-auth/member-auth.guard';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
@@ -23,9 +24,8 @@ export class MemberReferralController {
     return this.referralService.settle(dto.referrerMemberId, dto.inviteeMemberId, dto.orderNo, Math.round(dto.amountYuan * 100));
   }
 
-  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @UseGuards(MemberAuthGuard)
   @Get('rewards/:memberId')
-  @Permissions('member:referral:list')
   rewards(@Param('memberId', ParseIntPipe) memberId: number, @Query('page') page = 1, @Query('pageSize') pageSize = 10) {
     return this.referralService.pageRewards(memberId, Number(page), Number(pageSize));
   }

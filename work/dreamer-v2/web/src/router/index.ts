@@ -19,6 +19,9 @@ const router = createRouter({
       { path: 'rentals', name: 'Rentals', component: () => import('../views/rentals/Rentals.vue') },
       { path: 'activities', name: 'ActivityList', component: () => import('../views/activities/ActivityList.vue') },
       { path: 'activity/:id', name: 'ActivityDetail', component: () => import('../views/activities/ActivityDetail.vue') },
+      { path: 'member', name: 'MemberCenter', component: () => import('../views/member/MemberCenter.vue') },
+      { path: 'member/points', name: 'Points', component: () => import('../views/member/Points.vue') },
+      { path: 'member/wallet', name: 'Wallet', component: () => import('../views/member/Wallet.vue') },
     ]},
   ],
 });
