@@ -20,6 +20,8 @@ describe('AllExceptionsFilter', () => {
     filter.catch(new BusinessException('库存不足', 50001), host);
     const json = host.switchToHttp().getResponse().json as jest.Mock;
     expect(json).toHaveBeenCalledWith(expect.objectContaining({ code: 50001, message: '库存不足' }));
+    const status = host.switchToHttp().getResponse().status as jest.Mock;
+    expect(status).toHaveBeenCalledWith(400);
   });
 
   it('formats HttpException with http status', () => {

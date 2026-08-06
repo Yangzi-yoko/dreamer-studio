@@ -32,7 +32,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
       this.logger.error((exception as Error).message, (exception as Error).stack);
     }
 
-    const status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = exception instanceof HttpException
+      ? exception.getStatus()
+      : exception instanceof BusinessException
+        ? HttpStatus.BAD_REQUEST
+        : HttpStatus.INTERNAL_SERVER_ERROR;
     response.status(status).json({ code, message, timestamp: new Date().toISOString(), path });
   }
 }
