@@ -11,10 +11,11 @@ import { TimeSlotController } from './time-slot.controller';
 import { BookingService } from './booking.service';
 import { BookingController } from './booking.controller';
 import { BookingLifecycleService } from './booking-lifecycle.service';
+import { CalendarController } from './calendar.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot])],
-  controllers: [StudioController, TimeSlotController, BookingController],
+  controllers: [StudioController, TimeSlotController, BookingController, CalendarController],
   providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService],
   exports: [StudioService],
 })

@@ -48,4 +48,30 @@ describe('BookingService', () => {
     };
     await expect(service.create(dto as any)).rejects.toThrow('不能预订过去的日期');
   });
+
+  it('calendar groups bookings by date', async () => {
+    const bookingRepo2: any = {
+      create: jest.fn(),
+      save: jest.fn(),
+      find: jest.fn().mockResolvedValue([
+        { id: 1, bookingNo: 'B1', customerName: '张三', customerPhone: '13800000000', status: 'paid', bookingDate: '2026-10-01' },
+        { id: 2, bookingNo: 'B2', customerName: '李四', customerPhone: '13900000000', status: 'checked', bookingDate: '2026-10-02' },
+      ]),
+      findAndCount: jest.fn(),
+    };
+    const btsRepoFind: any = {
+      create: jest.fn(),
+      save: jest.fn(),
+      find: jest.fn().mockResolvedValue([
+        { bookingId: 1, timeSlotId: 11 },
+        { bookingId: 2, timeSlotId: 21 },
+      ]),
+    };
+    const service2 = new BookingService(studioRepo, bookingRepo2, slotRepo, btsRepoFind, dataSource, redis);
+    const cal = await service2.calendar(1, '2026-10');
+    expect(cal).toHaveLength(31);
+    expect(cal[0].date).toBe('2026-10-01');
+    expect(cal[0].bookings[0].timeSlotIds).toEqual([11]);
+    expect(cal[1].occupiedTimeSlotIds).toEqual([21]);
+  });
 });

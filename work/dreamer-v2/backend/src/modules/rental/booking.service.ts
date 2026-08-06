@@ -105,4 +105,39 @@ export class BookingService {
     });
     return { list, total, page, pageSize };
   }
+
+  async calendar(studioId: number, month: string): Promise<any[]> {
+    const [y, m] = month.split('-').map(Number);
+    const first = new Date(y, m - 1, 1);
+    const last = new Date(y, m, 0);
+    const dates: string[] = [];
+    for (let d = new Date(first); d <= last; d.setDate(d.getDate() + 1)) {
+      dates.push(formatDate(new Date(d)));
+    }
+    const bookings = await this.bookingRepo.find({
+      where: { studioId, bookingDate: In(dates), status: In(['pending', 'paid', 'checked', 'completed']) },
+    });
+    if (!bookings.length) return dates.map((date) => ({ date, occupiedTimeSlotIds: [], bookings: [] }));
+    const links = await this.btsRepo.find({ where: { bookingId: In(bookings.map((b) => b.id)) } });
+    const byDate = new Map<string, any[]>();
+    bookings.forEach((b) => {
+      const slots = links.filter((l) => l.bookingId === b.id).map((l) => l.timeSlotId);
+      const entry = {
+        id: b.id,
+        bookingNo: b.bookingNo,
+        customerName: b.customerName,
+        customerPhone: b.customerPhone,
+        status: b.status,
+        timeSlotIds: slots,
+      };
+      const arr = byDate.get(b.bookingDate) || [];
+      arr.push(entry);
+      byDate.set(b.bookingDate, arr);
+    });
+    return dates.map((date) => ({
+      date,
+      occupiedTimeSlotIds: (byDate.get(date) || []).flatMap((b) => b.timeSlotIds),
+      bookings: byDate.get(date) || [],
+    }));
+  }
 }
