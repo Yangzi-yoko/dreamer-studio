@@ -4,6 +4,7 @@ import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
 import { MemberCouponService } from './member-coupon.service';
 import { SaveCouponDto } from './dto/save-coupon.dto';
+import { BusinessException } from '../../common/exceptions/business.exception';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('member/coupons')
@@ -50,6 +51,9 @@ export class MemberCouponController {
   @Post('users/:userCouponId/use')
   @Permissions('member:coupon:list')
   use(@Param('userCouponId', ParseIntPipe) userCouponId: number, @Body() dto: { memberId: number; orderNo: string; amountYuan: number }) {
+    if (!dto?.memberId) throw new BusinessException('缺少会员ID', 40030);
+    if (!dto?.orderNo) throw new BusinessException('缺少订单号', 40030);
+    if (typeof dto?.amountYuan !== 'number' || dto.amountYuan <= 0) throw new BusinessException('缺少有效金额', 40030);
     return this.couponService.use(dto.memberId, userCouponId, dto.orderNo, Math.round(dto.amountYuan * 100));
   }
 }

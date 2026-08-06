@@ -4,6 +4,7 @@ import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
 import { MemberPackageService } from './member-package.service';
 import { SavePackageCardDto } from './dto/save-package-card.dto';
+import { BusinessException } from '../../common/exceptions/business.exception';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('member/packages')
@@ -50,6 +51,7 @@ export class MemberPackageController {
   @Post('users/:userPackageId/use')
   @Permissions('member:package:list')
   use(@Param('userPackageId', ParseIntPipe) userPackageId: number, @Body() dto: { memberId: number; remark?: string }) {
+    if (!dto?.memberId) throw new BusinessException('缺少会员ID', 40030);
     return this.packageService.use(dto.memberId, userPackageId, dto.remark);
   }
 }
