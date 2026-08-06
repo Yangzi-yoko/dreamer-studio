@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SystemModule } from '../system/system.module';
 import { Studio } from './entities/studio.entity';
 import { TimeSlot } from './entities/time-slot.entity';
 import { Booking } from './entities/booking.entity';
@@ -14,7 +15,7 @@ import { BookingLifecycleService } from './booking-lifecycle.service';
 import { CalendarController } from './calendar.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot])],
+  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot]), SystemModule],
   controllers: [StudioController, TimeSlotController, BookingController, CalendarController],
   providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService],
   exports: [StudioService],
