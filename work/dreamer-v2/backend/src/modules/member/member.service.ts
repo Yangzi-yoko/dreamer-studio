@@ -21,8 +21,13 @@ export class MemberService extends BaseService<Member> {
   }
 
   async page(page = 1, pageSize = 10): Promise<PageResult<any>> {
-    const result = await super.page(page, pageSize);
-    return { ...result, list: result.list.map((m) => this.toPublic(m)) };
+    const [list, total] = await this.repo.findAndCount({
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+      order: { createdAt: 'DESC' } as any,
+      relations: { tags: true },
+    });
+    return { list: list.map((m) => this.toPublic(m)), total, page, pageSize };
   }
 
   async findOne(id: number): Promise<any> {

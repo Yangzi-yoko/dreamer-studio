@@ -13,12 +13,13 @@ describe('MemberService', () => {
   const service = new MemberService(repo, levelRepo, tagRepo);
 
   it('page converts cents to yuan', async () => {
-    repo.findAndCount.mockResolvedValue([
-      [{ id: 1, phone: '13800000000', nickname: '张三', totalSpendCents: 15000, totalOrders: 3, tags: [] }],
+    repo.findAndCount.mockImplementation(async (opts: any) => [
+      [{ id: 1, phone: '13800000000', nickname: '张三', totalSpendCents: 15000, totalOrders: 3, tags: [{ id: 1, name: 'VIP', color: '#E6A23C' }] }],
       1,
     ]);
     const res = await service.page(1, 10);
     expect(res.list[0].totalSpend).toBe(150);
+    expect(res.list[0].tags).toHaveLength(1);
   });
 
   it('rejects duplicate phone on create', async () => {
