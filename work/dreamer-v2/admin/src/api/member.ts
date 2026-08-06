@@ -39,4 +39,19 @@ export const memberApi = {
   couponIssue: (couponId: number, data: any) => request.post<any, any>(`/member/coupons/${couponId}/issue`, data),
   couponUsers: (memberId: number) => request.get<any, any>('/member/coupons/users', { params: { memberId } }),
   couponUse: (userCouponId: number, data: any) => request.post<any, any>(`/member/coupons/users/${userCouponId}/use`, data),
+
+  signinPage: (memberId: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/signin/${memberId}`, { params: { page, pageSize } }),
+
+  birthdayConfig: () => request.get<any, any>('/member/birthday/config'),
+  updateBirthdayConfig: (data: any) => request.put<any, any>('/member/birthday/config', data),
+  birthdayRunNow: () => request.post<any, any>('/member/birthday/run-now'),
+
+  referralRule: () => request.get<any, any>('/member/referral/rule'),
+  updateReferralRule: (data: any) => request.put<any, any>('/member/referral/rule', data),
+  referralRewards: (memberId: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/referral/rewards/${memberId}`, { params: { page, pageSize } }),
+
+  activityPage: (page: number, pageSize: number) => request.get<any, any>('/member/activities/admin', { params: { page, pageSize } }),
+  createActivity: (data: any) => request.post<any, any>('/member/activities', data),
+  updateActivity: (id: number, data: any) => request.put<any, any>(`/member/activities/${id}`, data),
+  activityRegistrations: (id: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/activities/${id}/registrations`, { params: { page, pageSize } }),
 };
