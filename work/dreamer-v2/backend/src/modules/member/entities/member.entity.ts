@@ -18,6 +18,9 @@ export class Member {
   @Column({ length: 5, nullable: true })
   birthday?: string;
 
+  @Column({ name: 'referral_code', unique: true, length: 16, nullable: true })
+  referralCode?: string;
+
   @Index()
   @Column({ name: 'level_id', type: 'int', nullable: true })
   levelId?: number;

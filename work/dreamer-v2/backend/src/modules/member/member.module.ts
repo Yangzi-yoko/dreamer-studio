@@ -35,11 +35,16 @@ import { BirthdayGift } from './entities/birthday-gift.entity';
 import { BirthdayGiftLog } from './entities/birthday-gift-log.entity';
 import { MemberBirthdayService } from './member-birthday.service';
 import { MemberBirthdayController } from './member-birthday.controller';
+import { ReferralRelation } from './entities/referral-relation.entity';
+import { ReferralRule } from './entities/referral-rule.entity';
+import { ReferralReward } from './entities/referral-reward.entity';
+import { MemberReferralService } from './member-referral.service';
+import { MemberReferralController } from './member-referral.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController, MemberBirthdayController],
-  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward]), SystemModule],
+  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController],
+  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService],
   exports: [MemberService],
 })
 export class MemberModule {}
