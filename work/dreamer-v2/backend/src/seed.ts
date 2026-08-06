@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { AdminUser } from './modules/system/entities/admin-user.entity';
