@@ -10,7 +10,7 @@ export class CalendarController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Get()
-  @Permissions('rental:booking:list')
+  @Permissions('rental:calendar:list')
   calendar(@Param('studioId', ParseIntPipe) studioId: number, @Query('month') month: string) {
     return this.bookingService.calendar(studioId, month);
   }

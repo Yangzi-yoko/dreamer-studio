@@ -45,7 +45,7 @@ async function seed(): Promise<void> {
     { key: 'rental-booking-check', title: '核销/支付', type: 'button', permissionCode: 'rental:booking:check', sort: 1, parent: 'rental' },
     { key: 'rental-booking-cancel', title: '取消订单', type: 'button', permissionCode: 'rental:booking:cancel', sort: 2, parent: 'rental' },
     { key: 'rental-booking-refund', title: '退款', type: 'button', permissionCode: 'rental:booking:refund', sort: 3, parent: 'rental' },
-    { key: 'rental-calendar', title: '档期日历', path: '/rental/calendar', type: 'menu', permissionCode: 'rental:booking:list', sort: 3, parent: 'rental' },
+    { key: 'rental-calendar', title: '档期日历', path: '/rental/calendar', type: 'menu', permissionCode: 'rental:calendar:list', sort: 3, parent: 'rental' },
     { key: 'system', title: '系统管理', path: '/system', type: 'dir', permissionCode: 'system', sort: 99 },
     { key: 'system-admin', title: '管理员管理', path: '/system/admin', type: 'menu', permissionCode: 'system:admin:list', sort: 1, parent: 'system' },
     { key: 'system-admin-create', title: '新增管理员', type: 'button', permissionCode: 'system:admin:create', sort: 1, parent: 'system' },
