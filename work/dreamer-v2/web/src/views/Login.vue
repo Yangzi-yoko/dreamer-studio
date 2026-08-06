@@ -7,16 +7,20 @@ import { useAuthStore } from '../stores/auth';
 const router = useRouter();
 const store = useAuthStore();
 const loading = ref(false);
-const form = reactive({ phone: '' });
+const form = reactive({ username: '', password: '' });
 
 async function submit() {
-  if (!/^1\d{10}$/.test(form.phone)) {
-    ElMessage.warning('请输入正确的手机号');
+  if (!form.username.trim()) {
+    ElMessage.warning('请输入账号');
+    return;
+  }
+  if (!form.password) {
+    ElMessage.warning('请输入密码');
     return;
   }
   loading.value = true;
   try {
-    await store.login(form.phone);
+    await store.login(form.username.trim(), form.password);
     ElMessage.success('登录成功');
     router.push('/home');
   } catch (e: any) {
@@ -32,7 +36,10 @@ async function submit() {
     <h2 style="text-align: center">造梦者摄影棚</h2>
     <el-form @submit.prevent="submit">
       <el-form-item>
-        <el-input v-model="form.phone" placeholder="手机号" maxlength="11" />
+        <el-input v-model="form.username" placeholder="账号" maxlength="64" />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="form.password" type="password" placeholder="密码" maxlength="64" show-password />
       </el-form-item>
       <el-button type="primary" style="width: 100%" :loading="loading" @click="submit">登录</el-button>
     </el-form>

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import configuration from './config/configuration';
 import { Member } from './modules/member/entities/member.entity';
 import { MemberLevel } from './modules/member/entities/member-level.entity';
@@ -43,8 +44,8 @@ async function seedMember(): Promise<void> {
     const memberRepo = ds.getRepository(Member);
     if (!(await memberRepo.count())) {
       await memberRepo.save([
-        memberRepo.create({ phone: '13800000001', nickname: '示例会员A', totalSpendCents: 50000, totalOrders: 8, levelId: 2, tags: [vip] }),
-        memberRepo.create({ phone: '13800000002', nickname: '示例会员B', totalSpendCents: 500, totalOrders: 1, tags: [newbie] }),
+        memberRepo.create({ phone: '13800000001', username: '13800000001', passwordHash: bcrypt.hashSync('123456', 10), nickname: '示例会员A', totalSpendCents: 50000, totalOrders: 8, levelId: 2, tags: [vip] }),
+        memberRepo.create({ phone: '13800000002', username: '13800000002', passwordHash: bcrypt.hashSync('123456', 10), nickname: '示例会员B', totalSpendCents: 500, totalOrders: 1, tags: [newbie] }),
       ]);
       console.log('Seed members done: 2 members');
     }

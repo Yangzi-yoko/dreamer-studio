@@ -9,6 +9,12 @@ export class Member {
   @Column({ unique: true, length: 20 })
   phone!: string;
 
+  @Column({ unique: true, length: 64, nullable: true })
+  username?: string;
+
+  @Column({ name: 'password_hash', length: 128, nullable: true })
+  passwordHash?: string;
+
   @Column({ length: 64, nullable: true })
   nickname?: string;
 

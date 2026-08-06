@@ -1,10 +1,10 @@
 import request from './request';
 
 export const api = {
-  register: (phone: string, nickname: string) =>
-    request.post<any, any>('/member-auth/register', { phone, nickname }),
-  login: (phone: string) =>
-    request.post<any, any>('/member-auth/login', { phone }),
+  register: (phone: string, username: string, password: string, nickname: string) =>
+    request.post<any, any>('/member-auth/register', { phone, username, password, nickname }),
+  login: (username: string, password: string) =>
+    request.post<any, any>('/member-auth/login', { username, password }),
   me: () => request.get<any, any>('/member-auth/me'),
 
   studios: (page = 1, pageSize = 20) => request.get<any, any>('/rental/studios', { params: { page, pageSize } }),
