@@ -7,6 +7,7 @@ import configuration from './config/configuration';
 import { RedisModule } from './common/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { SystemModule } from './modules/system/system.module';
+import { RentalModule } from './modules/rental/rental.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { SystemModule } from './modules/system/system.module';
     RedisModule,
     AuthModule,
     SystemModule,
+    RentalModule,
   ],
   controllers: [AppController],
   providers: [AppService],
