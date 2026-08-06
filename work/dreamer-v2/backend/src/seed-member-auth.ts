@@ -4,6 +4,8 @@ import { DataSource, IsNull } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import configuration from './config/configuration';
 import { Member } from './modules/member/entities/member.entity';
+import { MemberLevel } from './modules/member/entities/member-level.entity';
+import { MemberTag } from './modules/member/entities/member-tag.entity';
 
 async function backfillMemberAuth(): Promise<void> {
   const db = configuration().database as any;
@@ -14,7 +16,7 @@ async function backfillMemberAuth(): Promise<void> {
     username: db.username,
     password: db.password,
     database: db.database,
-    entities: [Member],
+    entities: [Member, MemberLevel, MemberTag],
     synchronize: true,
     charset: 'utf8mb4',
   });
