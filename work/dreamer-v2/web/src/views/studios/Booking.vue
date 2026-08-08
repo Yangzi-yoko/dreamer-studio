@@ -14,6 +14,7 @@ const slots = ref<any[]>([]);
 const studio = ref<any>(null);
 const walletBalance = ref(0);
 const myPackages = ref<any[]>([]);
+const coupons = ref<any[]>([]);
 const preview = ref<any>(null);
 const submitting = ref(false);
 
@@ -24,10 +25,19 @@ const form = reactive({
   timeSlotIds: [] as number[],
   payMethod: 'wallet' as 'wallet' | 'package' | 'offline',
   userPackageId: undefined as number | undefined,
+  userCouponId: undefined as number | undefined,
 });
 
 const enabledSlots = computed(() => slots.value.filter((s: any) => s.enabled));
 const availablePackages = computed(() => myPackages.value.filter((p: any) => p.status === 'active' && p.remainingTimes > 0));
+const usableCoupons = computed(() => {
+  const total = preview.value?.totalAmount ?? 0;
+  return coupons.value.filter((c: any) => c.minSpend <= total);
+});
+const couponLabel = (c: any) => {
+  if (c.type === 'amount') return `${c.couponName}（满¥${c.minSpend}减¥${c.value / 100}）`;
+  return `${c.couponName}（${c.value}折）`;
+};
 
 onMounted(async () => {
   try {
@@ -45,13 +55,16 @@ onMounted(async () => {
     try {
       myPackages.value = (await api.myPackages()) as any[];
     } catch {}
+    try {
+      coupons.value = (await api.couponCards()) as any[];
+    } catch {}
   } else {
     form.payMethod = 'offline';
   }
 });
 
 watch(
-  () => [form.bookingDate, form.timeSlotIds.join(',')],
+  () => [form.bookingDate, form.timeSlotIds.join(','), form.userCouponId],
   async () => {
     preview.value = null;
     if (!form.bookingDate || !form.timeSlotIds.length) return;
@@ -60,8 +73,14 @@ watch(
         studioId,
         bookingDate: form.bookingDate,
         timeSlotIds: form.timeSlotIds,
+        memberId: memberId || undefined,
+        userCouponId: form.userCouponId,
       });
     } catch (e: any) {
+      if (e?.message?.includes('使用门槛') && form.userCouponId) {
+        form.userCouponId = undefined;
+        return;
+      }
       ElMessage.error(e.message || '计价失败');
     }
   },
@@ -80,6 +99,10 @@ async function submit() {
     ElMessage.warning('请选择要使用的次卡');
     return;
   }
+  if (form.userCouponId && form.payMethod !== 'wallet') {
+    ElMessage.warning('优惠券仅支持储值余额支付');
+    return;
+  }
   submitting.value = true;
   try {
     const payload: any = {
@@ -92,6 +115,7 @@ async function submit() {
     };
     if (memberId) payload.memberId = memberId;
     if (form.payMethod === 'package') payload.userPackageId = form.userPackageId;
+    if (form.payMethod === 'wallet' && form.userCouponId) payload.userCouponId = form.userCouponId;
     await api.createBooking(payload);
     ElMessage.success(form.payMethod === 'offline' ? '下单成功，待支付' : '预订成功，已扣费');
     router.push('/orders');
@@ -128,6 +152,12 @@ async function submit() {
         <span style="color: #f56c6c; font-size: 18px">¥{{ preview.totalAmount }}</span>
         <span style="color: #999; margin-left: 8px">（{{ preview.slotCount }} 个时段 × ¥{{ preview.unitPrice }}）</span>
       </el-form-item>
+      <el-form-item v-if="preview && preview.deduct > 0" label="优惠">
+        <span style="color: #67c23a">-¥{{ preview.deduct }}（{{ preview.couponName }}）</span>
+      </el-form-item>
+      <el-form-item v-if="preview && preview.deduct > 0" label="实付">
+        <span style="color: #e6a23c; font-size: 18px">¥{{ preview.payable }}</span>
+      </el-form-item>
 
       <el-form-item v-if="loggedIn" label="支付方式">
         <el-radio-group v-model="form.payMethod">
@@ -135,6 +165,18 @@ async function submit() {
           <el-radio value="package" :disabled="!availablePackages.length">次卡</el-radio>
           <el-radio value="offline">线下支付</el-radio>
         </el-radio-group>
+      </el-form-item>
+      <el-form-item v-if="loggedIn && form.payMethod === 'wallet'" label="优惠券">
+        <el-select v-model="form.userCouponId" clearable placeholder="选择优惠券（可选）" style="width: 100%">
+          <el-option
+            v-for="c in usableCoupons"
+            :key="c.id"
+            :value="c.id"
+            :label="couponLabel(c)"
+          />
+        </el-select>
+        <div v-if="usableCoupons.length" style="color: #999; font-size: 12px">满 ¥{{ preview?.totalAmount ?? 0 }} 可用</div>
+        <div v-else style="color: #999; font-size: 12px">暂无可用优惠券</div>
       </el-form-item>
       <el-form-item v-if="loggedIn && form.payMethod === 'package'" label="选择次卡">
         <el-select v-model="form.userPackageId" placeholder="选择次卡" style="width: 100%">

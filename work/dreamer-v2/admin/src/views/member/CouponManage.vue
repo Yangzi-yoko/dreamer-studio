@@ -159,8 +159,8 @@ onMounted(load);
         <el-form-item v-if="form.type === 'amount'" label="满减金额(元)">
           <el-input-number v-model="form.valueYuan" :min="0" :precision="2" />
         </el-form-item>
-        <el-form-item v-else label="折扣(0-100)">
-          <el-input-number v-model="form.valueDiscount" :min="0" :max="100" />
+        <el-form-item v-else label="折扣(折数)">
+          <el-input-number v-model="form.valueDiscount" :min="1" :max="10" />
         </el-form-item>
         <el-form-item label="使用门槛(元)"><el-input-number v-model="form.minSpendYuan" :min="0" :precision="2" /></el-form-item>
         <el-form-item label="发行总量"><el-input-number v-model="form.totalCount" :min="1" /></el-form-item>

@@ -31,6 +31,12 @@ export class MemberCouponController {
     return this.couponService.pageUserCoupons(member.memberId);
   }
 
+  @UseGuards(MemberAuthGuard)
+  @Get('mine/cards')
+  mineCards(@CurrentMember() member: CurrentMemberPayload) {
+    return this.couponService.usableCards(member.memberId);
+  }
+
   @Post()
   @Permissions('member:coupon:create')
   create(@Body() dto: SaveCouponDto) {

@@ -24,9 +24,12 @@ import { MemberWallet } from '../member/entities/member-wallet.entity';
 import { WalletLog } from '../member/entities/wallet-log.entity';
 import { UserPackage } from '../member/entities/user-package.entity';
 import { PackageUsage } from '../member/entities/package-usage.entity';
+import { Coupon } from '../member/entities/coupon.entity';
+import { UserCoupon } from '../member/entities/user-coupon.entity';
+import { CouponUsage } from '../member/entities/coupon-usage.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental, MemberWallet, WalletLog, UserPackage, PackageUsage]), SystemModule],
+  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental, MemberWallet, WalletLog, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage]), SystemModule],
   controllers: [StudioController, TimeSlotController, BookingController, CalendarController, RentalItemController, ItemRentalController],
   providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService, ItemRentalService, ItemRentalLifecycleService],
   exports: [StudioService],

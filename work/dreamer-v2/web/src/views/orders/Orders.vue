@@ -27,7 +27,11 @@ onMounted(load);
     </div>
     <div v-for="o in list" :key="o.id" class="card">
       <div>{{ o.bookingNo }} · {{ o.bookingDate }}</div>
-      <div>金额 ¥{{ (o.totalAmountCents / 100).toFixed(2) }} · 押金 ¥{{ (o.depositCents / 100).toFixed(2) }}</div>
+      <div>
+        金额 ¥{{ (o.totalAmountCents / 100).toFixed(2) }}
+        <template v-if="o.discountCents"> · 优惠 -¥{{ (o.discountCents / 100).toFixed(2) }}</template>
+        · 押金 ¥{{ (o.depositCents / 100).toFixed(2) }}
+      </div>
       <el-tag>{{ statusMap[o.status] || o.status }}</el-tag>
     </div>
     <el-empty v-if="!list.length" description="暂无订单" />

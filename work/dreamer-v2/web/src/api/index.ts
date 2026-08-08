@@ -26,6 +26,7 @@ export const api = {
   packageMall: () => request.get<any, any>('/member/packages/mall'),
   packageMallBuy: (packageId: number) => request.post<any, any>(`/member/packages/mall/${packageId}/buy`, {}),
   myPackages: () => request.get<any, any>('/member/packages/mine'),
+  couponCards: () => request.get<any, any>('/member/coupons/mine/cards'),
   myCoupons: () => request.get<any, any>('/member/coupons/mine'),
   referralCode: (memberId: number) => request.get<any, any>(`/member/referral/code/${memberId}`),
 };

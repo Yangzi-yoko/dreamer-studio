@@ -23,4 +23,11 @@ describe('MemberCouponService', () => {
     const res = await service.use(1, 1, 'B1', 10000);
     expect(res.deductCents).toBe(1000);
   });
+
+  it('use computes discount deduction (9折 on 200元 -> 20元)', async () => {
+    userRepo.findOneBy.mockResolvedValue({ id: 2, memberId: 1, couponId: 2, status: 'unused' });
+    couponRepo.findOneBy.mockResolvedValue({ id: 2, type: 'discount', value: 9, minSpendCents: 0, enabled: true });
+    const res = await service.use(1, 2, 'B2', 20000);
+    expect(res.deductCents).toBe(2000);
+  });
 });

@@ -34,6 +34,9 @@ export class Booking {
   @Column({ name: 'total_amount_cents', type: 'int', default: 0 })
   totalAmountCents!: number;
 
+  @Column({ name: 'discount_cents', type: 'int', default: 0 })
+  discountCents!: number;
+
   @Column({ name: 'deposit_cents', type: 'int', default: 0 })
   depositCents!: number;
 

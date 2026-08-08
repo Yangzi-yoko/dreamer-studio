@@ -5,6 +5,7 @@ import { RedisService } from '../../common/redis/redis.service';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { formatDate, isHoliday, isWeekend, parseDate } from '../../common/utils/date.utils';
 import { toYuan } from '../../common/utils/money.utils';
+import { computeCouponDeduct } from '../../common/utils/coupon.utils';
 import { Studio } from './entities/studio.entity';
 import { Booking } from './entities/booking.entity';
 import { BookingTimeSlot } from './entities/booking-time-slot.entity';
@@ -14,6 +15,9 @@ import { MemberWallet } from '../member/entities/member-wallet.entity';
 import { WalletLog } from '../member/entities/wallet-log.entity';
 import { UserPackage } from '../member/entities/user-package.entity';
 import { PackageUsage } from '../member/entities/package-usage.entity';
+import { Coupon } from '../member/entities/coupon.entity';
+import { UserCoupon } from '../member/entities/user-coupon.entity';
+import { CouponUsage } from '../member/entities/coupon-usage.entity';
 
 @Injectable()
 export class BookingService {
@@ -26,6 +30,9 @@ export class BookingService {
     @InjectRepository(WalletLog) private readonly walletLogRepo: Repository<WalletLog>,
     @InjectRepository(UserPackage) private readonly userPackageRepo: Repository<UserPackage>,
     @InjectRepository(PackageUsage) private readonly packageUsageRepo: Repository<PackageUsage>,
+    @InjectRepository(Coupon) private readonly couponRepo: Repository<Coupon>,
+    @InjectRepository(UserCoupon) private readonly userCouponRepo: Repository<UserCoupon>,
+    @InjectRepository(CouponUsage) private readonly couponUsageRepo: Repository<CouponUsage>,
     private readonly dataSource: DataSource,
     private readonly redis: RedisService,
   ) {}
@@ -38,7 +45,22 @@ export class BookingService {
         : studio.weekdayPriceCents;
   }
 
-  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[] }): Promise<any> {
+  private async resolveCoupon(
+    memberId: number,
+    userCouponId: number,
+    amountCents: number,
+    repos: { userCoupon: Repository<UserCoupon>; coupon: Repository<Coupon> },
+  ): Promise<{ uc: UserCoupon; deductCents: number; couponName: string }> {
+    const uc = await repos.userCoupon.findOneBy({ id: userCouponId, memberId });
+    if (!uc) throw new BusinessException('优惠券不存在', 40400);
+    if (uc.status !== 'unused') throw new BusinessException('优惠券已使用', 40044);
+    const coupon = await repos.coupon.findOneBy({ id: uc.couponId });
+    if (!coupon || !coupon.enabled) throw new BusinessException('优惠券不可用', 40045);
+    if (amountCents < coupon.minSpendCents) throw new BusinessException('未达到使用门槛', 40046);
+    return { uc, deductCents: computeCouponDeduct(coupon, amountCents), couponName: coupon.name };
+  }
+
+  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number }): Promise<any> {
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
     const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });
@@ -47,14 +69,28 @@ export class BookingService {
     }
     const unitPriceCents = this.priceOf(studio, parseDate(dto.bookingDate));
     const slotCount = slots.length;
-    return {
+    const totalAmount = unitPriceCents * slotCount;
+    const result: any = {
       studioId: dto.studioId,
       bookingDate: dto.bookingDate,
       slotCount,
       unitPrice: toYuan(unitPriceCents),
-      totalAmount: toYuan(unitPriceCents * slotCount),
+      totalAmount: toYuan(totalAmount),
       deposit: toYuan(studio.depositCents),
     };
+    if (dto.memberId && dto.userCouponId) {
+      const { deductCents, couponName } = await this.resolveCoupon(dto.memberId, dto.userCouponId, totalAmount, {
+        userCoupon: this.userCouponRepo,
+        coupon: this.couponRepo,
+      });
+      result.deduct = toYuan(deductCents);
+      result.payable = toYuan(totalAmount - deductCents);
+      result.couponName = couponName;
+    } else {
+      result.deduct = 0;
+      result.payable = result.totalAmount;
+    }
+    return result;
   }
 
   async create(dto: CreateBookingDto): Promise<Booking> {
@@ -103,8 +139,20 @@ export class BookingService {
         if (payMethod === 'package' && !dto.userPackageId) {
           throw new BusinessException('请选择要使用的次卡', 40043);
         }
+        if (dto.userCouponId && payMethod !== 'wallet') {
+          throw new BusinessException('优惠券仅支持储值余额支付', 40047);
+        }
         const totalAmountCents = unitPriceCents * slotCount;
         const finalStatus = payMethod === 'offline' ? 'pending' : 'paid';
+        let discountCents = 0;
+        let couponDeductInfo: { uc: UserCoupon; deductCents: number; couponName: string } | null = null;
+        if (dto.userCouponId && dto.memberId) {
+          couponDeductInfo = await this.resolveCoupon(dto.memberId, dto.userCouponId, totalAmountCents, {
+            userCoupon: manager.getRepository(UserCoupon),
+            coupon: manager.getRepository(Coupon),
+          });
+          discountCents = couponDeductInfo.deductCents;
+        }
         const booking = manager.create(Booking, {
           bookingNo,
           studioId: studio.id,
@@ -115,6 +163,7 @@ export class BookingService {
           slotCount,
           unitPriceCents,
           totalAmountCents,
+          discountCents,
           depositCents: studio.depositCents,
           remark: dto.remark,
         });
@@ -126,16 +175,28 @@ export class BookingService {
           if (!wallet) {
             wallet = await walletRepo.save(walletRepo.create({ memberId: dto.memberId, balanceCents: 0 }));
           }
-          if (wallet.balanceCents < totalAmountCents) throw new BusinessException('余额不足', 40041);
-          wallet.balanceCents -= totalAmountCents;
+          const payableCents = totalAmountCents - discountCents;
+          if (wallet.balanceCents < payableCents) throw new BusinessException('余额不足', 40041);
+          wallet.balanceCents -= payableCents;
           const savedWallet = await walletRepo.save(wallet);
           await logRepo.save(logRepo.create({
             memberId: dto.memberId,
             type: 'deduct',
-            amountCents: totalAmountCents,
+            amountCents: payableCents,
             balanceAfterCents: savedWallet.balanceCents,
-            remark: `场地预订 ${bookingNo}`,
+            remark: `场地预订 ${bookingNo}${discountCents ? `（优惠券减免¥${toYuan(discountCents)}）` : ''}`,
           }));
+          if (couponDeductInfo) {
+            couponDeductInfo.uc.status = 'used';
+            couponDeductInfo.uc.usedAt = new Date();
+            await manager.getRepository(UserCoupon).save(couponDeductInfo.uc);
+            await manager.getRepository(CouponUsage).save(manager.getRepository(CouponUsage).create({
+              userCouponId: couponDeductInfo.uc.id,
+              memberId: dto.memberId,
+              orderNo: bookingNo,
+              deductCents: discountCents,
+            }));
+          }
         } else if (payMethod === 'package') {
           const upRepo = manager.getRepository(UserPackage);
           const usageRepo = manager.getRepository(PackageUsage);

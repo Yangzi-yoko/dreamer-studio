@@ -43,6 +43,9 @@ onMounted(load);
       <el-table-column label="金额" width="100">
         <template #default="{ row }">¥{{ (row.totalAmountCents / 100).toFixed(2) }}</template>
       </el-table-column>
+      <el-table-column label="优惠" width="90">
+        <template #default="{ row }">¥{{ ((row.discountCents || 0) / 100).toFixed(2) }}</template>
+      </el-table-column>
       <el-table-column label="押金" width="90">
         <template #default="{ row }">¥{{ (row.depositCents / 100).toFixed(2) }}</template>
       </el-table-column>

@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsInt, Matches } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsInt, IsOptional, Matches } from 'class-validator';
 
 export class PreviewBookingDto {
   @IsInt()
@@ -11,4 +11,12 @@ export class PreviewBookingDto {
   @ArrayNotEmpty()
   @IsInt({ each: true })
   timeSlotIds!: number[];
+
+  @IsOptional()
+  @IsInt()
+  memberId?: number;
+
+  @IsOptional()
+  @IsInt()
+  userCouponId?: number;
 }

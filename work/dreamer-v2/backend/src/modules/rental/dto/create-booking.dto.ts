@@ -37,4 +37,8 @@ export class CreateBookingDto {
   @IsOptional()
   @IsInt()
   userPackageId?: number;
+
+  @IsOptional()
+  @IsInt()
+  userCouponId?: number;
 }

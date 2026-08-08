@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { toCents, toYuan } from '../../common/utils/money.utils';
+import { computeCouponDeduct } from '../../common/utils/coupon.utils';
 import { Coupon } from './entities/coupon.entity';
 import { UserCoupon } from './entities/user-coupon.entity';
 import { CouponUsage } from './entities/coupon-usage.entity';
@@ -57,13 +58,7 @@ export class MemberCouponService {
     if (!coupon || !coupon.enabled) throw new BusinessException('优惠券不可用', 40045);
     if (amountCents < coupon.minSpendCents) throw new BusinessException('未达到使用门槛', 40046);
 
-    let deductCents = 0;
-    if (coupon.type === 'amount') {
-      deductCents = Math.min(coupon.value, amountCents);
-    } else {
-      const discount = Math.max(0, Math.min(coupon.value, 100));
-      deductCents = Math.round((amountCents * (100 - discount)) / 100);
-    }
+    const deductCents = computeCouponDeduct(coupon, amountCents);
 
     uc.status = 'used';
     uc.usedAt = new Date();
@@ -76,5 +71,27 @@ export class MemberCouponService {
 
   async pageUserCoupons(memberId: number): Promise<UserCoupon[]> {
     return this.userRepo.find({ where: { memberId }, order: { createdAt: 'DESC' } });
+  }
+
+  async usableCards(memberId: number): Promise<any[]> {
+    const userCoupons = await this.userRepo.find({ where: { memberId, status: 'unused' }, order: { createdAt: 'DESC' } });
+    const couponIds = [...new Set(userCoupons.map((uc) => uc.couponId))];
+    const coupons = couponIds.length ? await this.couponRepo.findBy({ id: In(couponIds) }) : [];
+    const couponMap = new Map(coupons.map((c) => [c.id, c]));
+    return userCoupons
+      .map((uc) => {
+        const coupon = couponMap.get(uc.couponId);
+        if (!coupon || !coupon.enabled) return null;
+        return {
+          id: uc.id,
+          couponId: uc.couponId,
+          status: uc.status,
+          couponName: coupon.name,
+          type: coupon.type,
+          value: coupon.value,
+          minSpend: toYuan(coupon.minSpendCents),
+        };
+      })
+      .filter((x): x is any => !!x);
   }
 }
