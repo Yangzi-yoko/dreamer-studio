@@ -2,13 +2,12 @@
 import { onMounted, ref } from 'vue';
 import { api } from '../../api';
 
-const memberId = Number(localStorage.getItem('member_id')) || 0;
 const balance = ref(0);
 const logs = ref<any[]>([]);
 
 onMounted(async () => {
   try {
-    const res: any = await api.memberPoints(memberId);
+    const res: any = await api.memberPoints();
     balance.value = res.account?.balance ?? 0;
     logs.value = res.logs?.list || [];
   } catch {}

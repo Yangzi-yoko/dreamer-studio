@@ -16,7 +16,7 @@ const packageNames = ref<Record<number, string>>({});
 
 onMounted(async () => {
   try {
-    const p: any = await api.memberPoints(memberId);
+    const p: any = await api.memberPoints();
     points.value = p.account?.balance ?? 0;
   } catch (e: any) { ElMessage.error('积分加载失败'); }
   try {
@@ -31,7 +31,7 @@ onMounted(async () => {
     (mall || []).forEach((c: any) => { packageNames.value[c.id] = c.name; });
   } catch {}
   try {
-    coupons.value = (await api.myCoupons(memberId)) as any[];
+    coupons.value = (await api.myCoupons()) as any[];
   } catch {}
   try {
     referralCode.value = (await api.referralCode(memberId)) as string;

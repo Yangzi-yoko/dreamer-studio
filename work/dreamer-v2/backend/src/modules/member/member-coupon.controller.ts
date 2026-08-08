@@ -6,6 +6,7 @@ import { Permissions } from '../system/permissions.decorator';
 import { MemberCouponService } from './member-coupon.service';
 import { SaveCouponDto } from './dto/save-coupon.dto';
 import { BusinessException } from '../../common/exceptions/business.exception';
+import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('member/coupons')
@@ -18,10 +19,16 @@ export class MemberCouponController {
     return this.couponService.pageCoupons(Number(page), Number(pageSize));
   }
 
-  @UseGuards(MemberAuthGuard)
   @Get('users')
+  @Permissions('member:coupon:list')
   users(@Query('memberId', ParseIntPipe) memberId: number) {
     return this.couponService.pageUserCoupons(memberId);
+  }
+
+  @UseGuards(MemberAuthGuard)
+  @Get('mine')
+  mine(@CurrentMember() member: CurrentMemberPayload) {
+    return this.couponService.pageUserCoupons(member.memberId);
   }
 
   @Post()

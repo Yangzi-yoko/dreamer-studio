@@ -20,12 +20,12 @@ export const api = {
   activities: (page = 1, pageSize = 20) => request.get<any, any>('/member/activities', { params: { page, pageSize } }),
   registerActivity: (id: number, memberId: number) => request.post<any, any>(`/member/activities/${id}/register`, { memberId }),
 
-  memberPoints: (memberId: number) => request.get<any, any>(`/member/points/${memberId}`),
+  memberPoints: () => request.get<any, any>('/member/points/me'),
   memberWallet: () => request.get<any, any>('/member/wallet/me'),
   memberWalletRecharge: (amountYuan: number, remark?: string) => request.post<any, any>('/member/wallet/me/recharge', { amountYuan, remark }),
   packageMall: () => request.get<any, any>('/member/packages/mall'),
   packageMallBuy: (packageId: number) => request.post<any, any>(`/member/packages/mall/${packageId}/buy`, {}),
   myPackages: () => request.get<any, any>('/member/packages/mine'),
-  myCoupons: (memberId: number) => request.get<any, any>('/member/coupons/users', { params: { memberId } }),
+  myCoupons: () => request.get<any, any>('/member/coupons/mine'),
   referralCode: (memberId: number) => request.get<any, any>(`/member/referral/code/${memberId}`),
 };

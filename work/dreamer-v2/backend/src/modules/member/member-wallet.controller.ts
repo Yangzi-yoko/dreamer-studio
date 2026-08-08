@@ -40,7 +40,6 @@ export class MemberWalletController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Permissions('member:wallet:update')
   @Post(':memberId/recharge')
   recharge(@Param('memberId', ParseIntPipe) memberId: number, @Body() dto: { amountYuan: number; remark?: string }) {
     this.assertAmount(dto.amountYuan);
@@ -48,7 +47,6 @@ export class MemberWalletController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Permissions('member:wallet:update')
   @Post(':memberId/deduct')
   deduct(@Param('memberId', ParseIntPipe) memberId: number, @Body() dto: { amountYuan: number; remark?: string }) {
     this.assertAmount(dto.amountYuan);
@@ -56,7 +54,6 @@ export class MemberWalletController {
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
-  @Permissions('member:wallet:update')
   @Post(':memberId/refund')
   refund(@Param('memberId', ParseIntPipe) memberId: number, @Body() dto: { amountYuan: number; remark?: string }) {
     this.assertAmount(dto.amountYuan);
