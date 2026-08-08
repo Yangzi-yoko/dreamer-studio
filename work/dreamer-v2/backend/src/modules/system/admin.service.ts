@@ -87,9 +87,16 @@ export class AdminService extends BaseService<AdminUser> {
     if (admin?.isSuper) {
       return this.menuRepo.find({ where: { visible: true }, order: { sort: 'ASC' } });
     }
-    return this.menuRepo.find({
+    const allowed = await this.menuRepo.find({
       where: { visible: true, permissionCode: In(codes.length ? codes : ['__none__']) },
       order: { sort: 'ASC' },
     });
+    const parentIds = [...new Set(allowed.map((m) => m.parentId).filter((x): x is number => !!x))];
+    if (!parentIds.length) return allowed;
+    const parents = await this.menuRepo.find({
+      where: { id: In(parentIds), type: 'dir', visible: true },
+      order: { sort: 'ASC' },
+    });
+    return [...parents, ...allowed];
   }
 }

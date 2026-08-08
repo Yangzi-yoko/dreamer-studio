@@ -158,6 +158,8 @@ export class BookingService {
           studioId: studio.id,
           customerName: dto.customerName,
           customerPhone: dto.customerPhone,
+          memberId: dto.memberId ?? null,
+          payMethod,
           bookingDate: dto.bookingDate,
           status: 'pending',
           slotCount,

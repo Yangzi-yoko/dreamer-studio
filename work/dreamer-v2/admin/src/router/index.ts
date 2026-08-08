@@ -21,6 +21,7 @@ const routes: RouteRecordRaw[] = [
     { path: 'member/levels', name: 'LevelManage', component: () => import('../views/member/LevelManage.vue') },
     { path: 'member/tags', name: 'TagManage', component: () => import('../views/member/TagManage.vue') },
     { path: 'member/assets', name: 'PointsWallet', component: () => import('../views/member/PointsWallet.vue') },
+    { path: 'member/recharge-orders', name: 'RechargeOrders', component: () => import('../views/member/RechargeOrders.vue') },
     { path: 'member/packages', name: 'PackageManage', component: () => import('../views/member/PackageManage.vue') },
     { path: 'member/coupons', name: 'CouponManage', component: () => import('../views/member/CouponManage.vue') },
     { path: 'member/signin', name: 'SigninManage', component: () => import('../views/member/SigninManage.vue') },

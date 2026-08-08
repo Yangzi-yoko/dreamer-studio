@@ -24,6 +24,10 @@ export const memberApi = {
   walletDeduct: (memberId: number, data: any) => request.post<any, any>(`/member/wallet/${memberId}/deduct`, data),
   walletRefund: (memberId: number, data: any) => request.post<any, any>(`/member/wallet/${memberId}/refund`, data),
 
+  rechargeOrdersPage: (page: number, pageSize: number, status?: string) => request.get<any, any>('/member/wallet/recharge-orders', { params: { page, pageSize, status } }),
+  rechargeOrderPay: (id: number) => request.post<any, any>(`/member/wallet/recharge-orders/${id}/pay`, {}),
+  rechargeOrderCancel: (id: number) => request.post<any, any>(`/member/wallet/recharge-orders/${id}/cancel`, {}),
+
   packagePage: (page: number, pageSize: number) => request.get<any, any>('/member/packages', { params: { page, pageSize } }),
   createPackage: (data: any) => request.post<any, any>('/member/packages', data),
   updatePackage: (id: number, data: any) => request.put<any, any>(`/member/packages/${id}`, data),

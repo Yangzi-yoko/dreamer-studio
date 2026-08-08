@@ -19,6 +19,13 @@ export class Booking {
   customerPhone!: string;
 
   @Index()
+  @Column({ name: 'member_id', type: 'int', nullable: true })
+  memberId?: number;
+
+  @Column({ name: 'pay_method', length: 10, nullable: true })
+  payMethod?: string;
+
+  @Index()
   @Column({ name: 'booking_date', length: 10 })
   bookingDate!: string;
 
