@@ -36,7 +36,7 @@ const usableCoupons = computed(() => {
 });
 const couponLabel = (c: any) => {
   if (c.type === 'amount') return `${c.couponName}（满¥${c.minSpend}减¥${c.value / 100}）`;
-  return `${c.couponName}（${c.value}折）`;
+  return `${c.couponName}（${c.value / 10}折）`;
 };
 
 onMounted(async () => {

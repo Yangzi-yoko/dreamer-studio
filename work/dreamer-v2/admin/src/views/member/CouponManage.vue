@@ -40,7 +40,7 @@ function openEdit(row: any) {
   if (row.type === 'amount') {
     form.valueYuan = row.value / 100;
   } else {
-    form.valueDiscount = row.value;
+    form.valueDiscount = row.value / 10;
   }
   dialogVisible.value = true;
 }
@@ -49,7 +49,7 @@ function buildPayload() {
   return {
     name: form.name,
     type: form.type,
-    value: form.type === 'amount' ? Math.round(form.valueYuan * 100) : form.valueDiscount,
+    value: form.type === 'amount' ? Math.round(form.valueYuan * 100) : Math.round(form.valueDiscount * 10),
     minSpendYuan: form.minSpendYuan,
     totalCount: form.totalCount,
     enabled: form.enabled,
@@ -125,7 +125,7 @@ onMounted(load);
       </el-table-column>
       <el-table-column label="面值" width="100">
         <template #default="{ row }">
-          {{ row.type === 'amount' ? `¥${row.value / 100}` : `${row.value}折` }}
+          {{ row.type === 'amount' ? `¥${row.value / 100}` : `${row.value / 10}折` }}
         </template>
       </el-table-column>
       <el-table-column label="使用门槛" width="110">
