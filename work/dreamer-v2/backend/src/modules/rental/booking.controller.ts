@@ -5,6 +5,7 @@ import { Permissions } from '../system/permissions.decorator';
 import { BookingService } from './booking.service';
 import { BookingLifecycleService } from './booking-lifecycle.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { PreviewBookingDto } from './dto/preview-booking.dto';
 
 @Controller('rental/bookings')
 export class BookingController {
@@ -19,7 +20,7 @@ export class BookingController {
   }
 
   @Post('preview')
-  preview(@Body() dto: CreateBookingDto) {
+  preview(@Body() dto: PreviewBookingDto) {
     return this.bookingService.preview(dto);
   }
 

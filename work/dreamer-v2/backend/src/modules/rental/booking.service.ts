@@ -38,7 +38,7 @@ export class BookingService {
         : studio.weekdayPriceCents;
   }
 
-  async preview(dto: CreateBookingDto): Promise<any> {
+  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[] }): Promise<any> {
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
     const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });
