@@ -23,6 +23,7 @@ import { UserPackage } from './entities/user-package.entity';
 import { PackageUsage } from './entities/package-usage.entity';
 import { MemberPackageService } from './member-package.service';
 import { MemberPackageController } from './member-package.controller';
+import { MemberPackageMemberController } from './member-package.member.controller';
 import { Coupon } from './entities/coupon.entity';
 import { UserCoupon } from './entities/user-coupon.entity';
 import { CouponUsage } from './entities/coupon-usage.entity';
@@ -47,7 +48,7 @@ import { MemberActivityController } from './member-activity.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController],
+  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController],
   providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService],
   exports: [MemberService],
 })

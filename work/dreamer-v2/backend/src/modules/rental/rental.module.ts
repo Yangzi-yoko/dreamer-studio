@@ -20,9 +20,13 @@ import { RentalItemController } from './rental-item.controller';
 import { ItemRentalService } from './item-rental.service';
 import { ItemRentalController } from './item-rental.controller';
 import { ItemRentalLifecycleService } from './item-rental-lifecycle.service';
+import { MemberWallet } from '../member/entities/member-wallet.entity';
+import { WalletLog } from '../member/entities/wallet-log.entity';
+import { UserPackage } from '../member/entities/user-package.entity';
+import { PackageUsage } from '../member/entities/package-usage.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental]), SystemModule],
+  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental, MemberWallet, WalletLog, UserPackage, PackageUsage]), SystemModule],
   controllers: [StudioController, TimeSlotController, BookingController, CalendarController, RentalItemController, ItemRentalController],
   providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService, ItemRentalService, ItemRentalLifecycleService],
   exports: [StudioService],

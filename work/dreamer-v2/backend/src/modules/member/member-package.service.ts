@@ -6,6 +6,8 @@ import { toCents, toYuan } from '../../common/utils/money.utils';
 import { PackageCard } from './entities/package-card.entity';
 import { UserPackage } from './entities/user-package.entity';
 import { PackageUsage } from './entities/package-usage.entity';
+import { MemberWallet } from './entities/member-wallet.entity';
+import { WalletLog } from './entities/wallet-log.entity';
 import { SavePackageCardDto } from './dto/save-package-card.dto';
 
 @Injectable()
@@ -14,6 +16,8 @@ export class MemberPackageService {
     @InjectRepository(PackageCard) private readonly cardRepo: Repository<PackageCard>,
     @InjectRepository(UserPackage) private readonly userRepo: Repository<UserPackage>,
     @InjectRepository(PackageUsage) private readonly usageRepo: Repository<PackageUsage>,
+    @InjectRepository(MemberWallet) private readonly walletRepo: Repository<MemberWallet>,
+    @InjectRepository(WalletLog) private readonly logRepo: Repository<WalletLog>,
   ) {}
 
   async pageCards(page = 1, pageSize = 10): Promise<{ list: any[]; total: number; page: number; pageSize: number }> {
@@ -36,6 +40,26 @@ export class MemberPackageService {
   async buy(memberId: number, packageId: number): Promise<UserPackage> {
     const card = await this.cardRepo.findOneBy({ id: packageId, enabled: true });
     if (!card) throw new BusinessException('次卡不存在或已停售', 40400);
+    return this.userRepo.save(this.userRepo.create({
+      memberId, packageId, remainingTimes: card.totalTimes, status: 'active',
+    }));
+  }
+
+  async mall(): Promise<any[]> {
+    const cards = await this.cardRepo.find({ where: { enabled: true }, order: { createdAt: 'DESC' } });
+    return cards.map((c) => ({ ...c, price: toYuan(c.priceCents) }));
+  }
+
+  async buyWithWallet(memberId: number, packageId: number): Promise<UserPackage> {
+    const card = await this.cardRepo.findOneBy({ id: packageId, enabled: true });
+    if (!card) throw new BusinessException('次卡不存在或已停售', 40400);
+    const wallet = await this.walletRepo.findOneBy({ memberId });
+    if (!wallet || wallet.balanceCents < card.priceCents) throw new BusinessException('余额不足', 40041);
+    wallet.balanceCents -= card.priceCents;
+    await this.walletRepo.save(wallet);
+    await this.logRepo.save(this.logRepo.create({
+      memberId, type: 'deduct', amountCents: card.priceCents, balanceAfterCents: wallet.balanceCents, remark: `购买次卡「${card.name}」`,
+    }));
     return this.userRepo.save(this.userRepo.create({
       memberId, packageId, remainingTimes: card.totalTimes, status: 'active',
     }));

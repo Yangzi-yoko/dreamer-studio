@@ -9,11 +9,15 @@ describe('BookingService', () => {
   };
   const slotRepo: any = { find: jest.fn(), findBy: jest.fn() };
   const btsRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
+  const walletRepo: any = { findOneBy: jest.fn(), create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
+  const walletLogRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
+  const userPackageRepo: any = { findOneBy: jest.fn(), save: jest.fn(async (e: any) => e) };
+  const packageUsageRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
   const dataSource: any = {
     transaction: jest.fn(async (fn: any) => fn({ find: jest.fn().mockResolvedValue([]), findBy: jest.fn(), create: jest.fn((_entity: any, d: any) => d), save: jest.fn(async (e: any) => e) })),
   };
   const redis: any = { get: jest.fn().mockResolvedValue(null), set: jest.fn(), del: jest.fn() };
-  const service = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, dataSource, redis);
+  const service = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, walletRepo, walletLogRepo, userPackageRepo, packageUsageRepo, dataSource, redis);
 
   it('calculates holiday price first', async () => {
     studioRepo.findOneBy.mockResolvedValue({
@@ -67,7 +71,7 @@ describe('BookingService', () => {
         { bookingId: 2, timeSlotId: 21 },
       ]),
     };
-    const service2 = new BookingService(studioRepo, bookingRepo2, slotRepo, btsRepoFind, dataSource, redis);
+    const service2 = new BookingService(studioRepo, bookingRepo2, slotRepo, btsRepoFind, walletRepo, walletLogRepo, userPackageRepo, packageUsageRepo, dataSource, redis);
     const cal = await service2.calendar(1, '2026-10');
     expect(cal).toHaveLength(31);
     expect(cal[0].date).toBe('2026-10-01');
@@ -91,7 +95,7 @@ describe('BookingService', () => {
       save: jest.fn(async (e: any) => e),
     };
     const dataSourceOcc: any = { transaction: jest.fn(async (fn: any) => fn(occupied)) };
-    const service3 = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, dataSourceOcc, redis);
+    const service3 = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, walletRepo, walletLogRepo, userPackageRepo, packageUsageRepo, dataSourceOcc, redis);
     const dto = {
       studioId: 1,
       customerName: '张三',

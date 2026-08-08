@@ -9,6 +9,7 @@ export const api = {
 
   studios: (page = 1, pageSize = 20) => request.get<any, any>('/rental/studios', { params: { page, pageSize } }),
   studioTimeSlots: (studioId: number) => request.get<any, any>(`/rental/studios/${studioId}/time-slots`),
+  bookingPreview: (data: any) => request.post<any, any>('/rental/bookings/preview', data),
   createBooking: (data: any) => request.post<any, any>('/rental/bookings', data),
   myBookings: (phone: string) => request.get<any, any>('/rental/bookings/my', { params: { phone } }),
 
@@ -20,8 +21,11 @@ export const api = {
   registerActivity: (id: number, memberId: number) => request.post<any, any>(`/member/activities/${id}/register`, { memberId }),
 
   memberPoints: (memberId: number) => request.get<any, any>(`/member/points/${memberId}`),
-  memberWallet: (memberId: number) => request.get<any, any>(`/member/wallet/${memberId}`),
-  myPackages: (memberId: number) => request.get<any, any>('/member/packages/users', { params: { memberId } }),
+  memberWallet: () => request.get<any, any>('/member/wallet/me'),
+  memberWalletRecharge: (amountYuan: number, remark?: string) => request.post<any, any>('/member/wallet/me/recharge', { amountYuan, remark }),
+  packageMall: () => request.get<any, any>('/member/packages/mall'),
+  packageMallBuy: (packageId: number) => request.post<any, any>(`/member/packages/mall/${packageId}/buy`, {}),
+  myPackages: () => request.get<any, any>('/member/packages/mine'),
   myCoupons: (memberId: number) => request.get<any, any>('/member/coupons/users', { params: { memberId } }),
   referralCode: (memberId: number) => request.get<any, any>(`/member/referral/code/${memberId}`),
 };

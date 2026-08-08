@@ -1,4 +1,4 @@
-import { ArrayNotEmpty, IsArray, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { ArrayNotEmpty, IsArray, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
 
 export class CreateBookingDto {
   @IsInt()
@@ -29,4 +29,12 @@ export class CreateBookingDto {
   @IsOptional()
   @IsInt()
   memberId?: number;
+
+  @IsOptional()
+  @IsIn(['wallet', 'package', 'offline'])
+  payMethod?: 'wallet' | 'package' | 'offline';
+
+  @IsOptional()
+  @IsInt()
+  userPackageId?: number;
 }

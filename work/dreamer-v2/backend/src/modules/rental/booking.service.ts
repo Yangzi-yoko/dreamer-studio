@@ -4,11 +4,16 @@ import { DataSource, In, Repository } from 'typeorm';
 import { RedisService } from '../../common/redis/redis.service';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { formatDate, isHoliday, isWeekend, parseDate } from '../../common/utils/date.utils';
+import { toYuan } from '../../common/utils/money.utils';
 import { Studio } from './entities/studio.entity';
 import { Booking } from './entities/booking.entity';
 import { BookingTimeSlot } from './entities/booking-time-slot.entity';
 import { TimeSlot } from './entities/time-slot.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { MemberWallet } from '../member/entities/member-wallet.entity';
+import { WalletLog } from '../member/entities/wallet-log.entity';
+import { UserPackage } from '../member/entities/user-package.entity';
+import { PackageUsage } from '../member/entities/package-usage.entity';
 
 @Injectable()
 export class BookingService {
@@ -17,9 +22,40 @@ export class BookingService {
     @InjectRepository(Booking) private readonly bookingRepo: Repository<Booking>,
     @InjectRepository(TimeSlot) private readonly slotRepo: Repository<TimeSlot>,
     @InjectRepository(BookingTimeSlot) private readonly btsRepo: Repository<BookingTimeSlot>,
+    @InjectRepository(MemberWallet) private readonly walletRepo: Repository<MemberWallet>,
+    @InjectRepository(WalletLog) private readonly walletLogRepo: Repository<WalletLog>,
+    @InjectRepository(UserPackage) private readonly userPackageRepo: Repository<UserPackage>,
+    @InjectRepository(PackageUsage) private readonly packageUsageRepo: Repository<PackageUsage>,
     private readonly dataSource: DataSource,
     private readonly redis: RedisService,
   ) {}
+
+  private priceOf(studio: Studio, date: Date): number {
+    return isHoliday(date)
+      ? studio.holidayPriceCents
+      : isWeekend(date)
+        ? studio.weekendPriceCents
+        : studio.weekdayPriceCents;
+  }
+
+  async preview(dto: CreateBookingDto): Promise<any> {
+    const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
+    if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
+    const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });
+    if (slots.length !== dto.timeSlotIds.length) {
+      throw new BusinessException('部分时段无效或已停用', 40021);
+    }
+    const unitPriceCents = this.priceOf(studio, parseDate(dto.bookingDate));
+    const slotCount = slots.length;
+    return {
+      studioId: dto.studioId,
+      bookingDate: dto.bookingDate,
+      slotCount,
+      unitPrice: toYuan(unitPriceCents),
+      totalAmount: toYuan(unitPriceCents * slotCount),
+      deposit: toYuan(studio.depositCents),
+    };
+  }
 
   async create(dto: CreateBookingDto): Promise<Booking> {
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
@@ -57,13 +93,18 @@ export class BookingService {
           if (bookings.length) throw new BusinessException('该时段已被预订', 40900);
         }
 
-        const unitPriceCents = isHoliday(date)
-          ? studio.holidayPriceCents
-          : isWeekend(date)
-            ? studio.weekendPriceCents
-            : studio.weekdayPriceCents;
+        const unitPriceCents = this.priceOf(studio, date);
         const slotCount = slots.length;
         const bookingNo = `B${formatDate(new Date()).replace(/-/g, '')}${Date.now().toString(36).toUpperCase()}`;
+        const payMethod = dto.payMethod || 'offline';
+        if ((payMethod === 'wallet' || payMethod === 'package') && !dto.memberId) {
+          throw new BusinessException('请先登录会员后再选择线上支付', 40100);
+        }
+        if (payMethod === 'package' && !dto.userPackageId) {
+          throw new BusinessException('请选择要使用的次卡', 40043);
+        }
+        const totalAmountCents = unitPriceCents * slotCount;
+        const finalStatus = payMethod === 'offline' ? 'pending' : 'paid';
         const booking = manager.create(Booking, {
           bookingNo,
           studioId: studio.id,
@@ -73,11 +114,45 @@ export class BookingService {
           status: 'pending',
           slotCount,
           unitPriceCents,
-          totalAmountCents: unitPriceCents * slotCount,
+          totalAmountCents,
           depositCents: studio.depositCents,
           remark: dto.remark,
         });
         const saved = await manager.save(booking);
+        if (payMethod === 'wallet') {
+          const walletRepo = manager.getRepository(MemberWallet);
+          const logRepo = manager.getRepository(WalletLog);
+          let wallet = await walletRepo.findOneBy({ memberId: dto.memberId });
+          if (!wallet) {
+            wallet = await walletRepo.save(walletRepo.create({ memberId: dto.memberId, balanceCents: 0 }));
+          }
+          if (wallet.balanceCents < totalAmountCents) throw new BusinessException('余额不足', 40041);
+          wallet.balanceCents -= totalAmountCents;
+          const savedWallet = await walletRepo.save(wallet);
+          await logRepo.save(logRepo.create({
+            memberId: dto.memberId,
+            type: 'deduct',
+            amountCents: totalAmountCents,
+            balanceAfterCents: savedWallet.balanceCents,
+            remark: `场地预订 ${bookingNo}`,
+          }));
+        } else if (payMethod === 'package') {
+          const upRepo = manager.getRepository(UserPackage);
+          const usageRepo = manager.getRepository(PackageUsage);
+          const up = await upRepo.findOneBy({ id: dto.userPackageId, memberId: dto.memberId });
+          if (!up) throw new BusinessException('次卡不存在', 40400);
+          if (up.status !== 'active' || up.remainingTimes <= 0) throw new BusinessException('次卡次数不足', 40042);
+          up.remainingTimes -= 1;
+          await upRepo.save(up);
+          await usageRepo.save(usageRepo.create({
+            userPackageId: up.id,
+            memberId: dto.memberId,
+            times: 1,
+            remark: `场地预订 ${bookingNo}`,
+          }));
+        }
+        saved.status = finalStatus;
+        await manager.save(saved);
         await manager.save(
           slots.map((s) =>
             manager.create(BookingTimeSlot, {

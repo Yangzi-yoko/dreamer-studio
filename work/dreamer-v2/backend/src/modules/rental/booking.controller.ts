@@ -18,6 +18,11 @@ export class BookingController {
     return this.bookingService.create(dto);
   }
 
+  @Post('preview')
+  preview(@Body() dto: CreateBookingDto) {
+    return this.bookingService.preview(dto);
+  }
+
   @Get('my')
   my(@Query('phone') phone: string) {
     return this.bookingService.pageByPhone(phone);
