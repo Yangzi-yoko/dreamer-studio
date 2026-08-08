@@ -18,7 +18,7 @@ export class RechargeOrderService {
   async create(memberId: number, amountCents: number, remark?: string): Promise<RechargeOrder> {
     if (!Number.isFinite(amountCents) || amountCents <= 0) throw new BusinessException('充值金额必须大于 0', 40040);
     const orderNo = `R${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
-    return this.orderRepo.save(this.orderRepo.create({ memberId, amountCents, status: 'pending', remark }));
+    return this.orderRepo.save(this.orderRepo.create({ orderNo, memberId, amountCents, status: 'pending', remark }));
   }
 
   async mine(memberId: number): Promise<RechargeOrder[]> {

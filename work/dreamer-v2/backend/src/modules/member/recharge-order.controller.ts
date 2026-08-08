@@ -6,7 +6,7 @@ import { Permissions } from '../system/permissions.decorator';
 import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
 import { RechargeOrderService } from './recharge-order.service';
 
-@Controller('member/wallet/recharge-orders')
+@Controller('member/recharge-orders')
 export class RechargeOrderController {
   constructor(private readonly rechargeService: RechargeOrderService) {}
 
