@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { rentalApi } from '../../api/rental';
 
@@ -23,6 +23,8 @@ async function act(row: any, action: string, label: string) {
   ElMessage.success(`${label}成功`);
   load();
 }
+
+onMounted(load);
 </script>
 
 <template>

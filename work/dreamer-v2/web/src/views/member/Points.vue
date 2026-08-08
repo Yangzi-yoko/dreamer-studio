@@ -21,6 +21,7 @@ onMounted(async () => {
     <div v-for="l in logs" :key="l.id" class="card">
       {{ l.type === 'earn' ? '+' : '-' }}{{ l.points }} · {{ l.remark }} · 余额 {{ l.balanceAfter }}
     </div>
+    <el-empty v-if="!logs.length" description="暂无积分记录" />
   </div>
 </template>
 
