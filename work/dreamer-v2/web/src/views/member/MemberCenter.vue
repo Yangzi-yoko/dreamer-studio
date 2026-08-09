@@ -44,6 +44,7 @@ onMounted(async () => {
     <h2>会员中心</h2>
     <div>手机号：{{ phone }}</div>
     <div style="display: flex; gap: 8px; margin: 12px 0">
+      <el-button style="flex: 1" @click="router.push('/member/signin')">每日签到</el-button>
       <el-button style="flex: 1" @click="router.push('/member/points')">积分 {{ points }}</el-button>
       <el-button style="flex: 1" @click="router.push('/member/wallet')">储值 ¥{{ wallet }}</el-button>
       <el-button style="flex: 1" @click="router.push('/member/packages')">次卡商城</el-button>

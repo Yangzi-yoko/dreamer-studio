@@ -44,7 +44,7 @@ export const memberApi = {
   couponUsers: (memberId: number) => request.get<any, any>('/member/coupons/users', { params: { memberId } }),
   couponUse: (userCouponId: number, data: any) => request.post<any, any>(`/member/coupons/users/${userCouponId}/use`, data),
 
-  signinPage: (memberId: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/signin/${memberId}`, { params: { page, pageSize } }),
+  signinPage: (memberId: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/signin/admin/${memberId}`, { params: { page, pageSize } }),
 
   birthdayConfig: () => request.get<any, any>('/member/birthday/config'),
   updateBirthdayConfig: (data: any) => request.put<any, any>('/member/birthday/config', data),

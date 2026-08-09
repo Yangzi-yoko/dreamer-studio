@@ -22,10 +22,9 @@ export const api = {
 
   memberPoints: () => request.get<any, any>('/member/points/me'),
   memberWallet: () => request.get<any, any>('/member/wallet/me'),
-  memberWalletRecharge: (amountYuan: number, remark?: string) => request.post<any, any>('/member/wallet/me/recharge', { amountYuan, remark }),
-  createRechargeOrder: (amountYuan: number, remark?: string) => request.post<any, any>('/member/recharge-orders/me', { amountYuan, remark }),
-  myRechargeOrders: () => request.get<any, any>('/member/recharge-orders/me'),
-  payRechargeOrder: (id: number) => request.post<any, any>(`/member/recharge-orders/me/${id}/pay`, {}),
+  signinStatus: () => request.get<any, any>('/member/signin/status'),
+  signinCheckin: () => request.post<any, any>('/member/signin/checkin', {}),
+  mySigninLogs: () => request.get<any, any>('/member/signin/me'),
   packageMall: () => request.get<any, any>('/member/packages/mall'),
   packageMallBuy: (packageId: number) => request.post<any, any>(`/member/packages/mall/${packageId}/buy`, {}),
   myPackages: () => request.get<any, any>('/member/packages/mine'),

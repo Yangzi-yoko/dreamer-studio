@@ -20,6 +20,7 @@ const router = createRouter({
       { path: 'activities', name: 'ActivityList', component: () => import('../views/activities/ActivityList.vue') },
       { path: 'activity/:id', name: 'ActivityDetail', component: () => import('../views/activities/ActivityDetail.vue') },
       { path: 'member', name: 'MemberCenter', component: () => import('../views/member/MemberCenter.vue') },
+      { path: 'member/signin', name: 'Signin', component: () => import('../views/member/Signin.vue') },
       { path: 'member/points', name: 'Points', component: () => import('../views/member/Points.vue') },
       { path: 'member/wallet', name: 'Wallet', component: () => import('../views/member/Wallet.vue') },
       { path: 'member/packages', name: 'Packages', component: () => import('../views/member/Packages.vue') },
