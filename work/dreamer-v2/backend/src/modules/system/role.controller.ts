@@ -44,6 +44,12 @@ export class RoleController extends BaseController<Role> {
     return super.remove(id);
   }
 
+  @Get(':id/menus')
+  @Permissions('system:role:list')
+  menuIds(@Param('id', ParseIntPipe) id: number): Promise<number[]> {
+    return this.roleService.menuIdsOf(id);
+  }
+
   @Put(':id/menus')
   @Permissions('system:role:assign-menu')
   assignMenus(@Param('id', ParseIntPipe) id: number, @Body('menuIds') menuIds: number[]): Promise<Role> {

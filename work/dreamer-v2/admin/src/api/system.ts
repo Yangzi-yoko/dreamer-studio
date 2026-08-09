@@ -10,6 +10,7 @@ export const systemApi = {
   rolePage: (page: number, pageSize: number) => request.get('/system/roles', { params: { page, pageSize } }),
   createRole: (data: any) => request.post('/system/roles', data),
   updateRole: (id: number, data: any) => request.put(`/system/roles/${id}`, data),
+  roleMenus: (id: number) => request.get(`/system/roles/${id}/menus`),
   assignMenus: (id: number, menuIds: number[]) => request.put(`/system/roles/${id}/menus`, { menuIds }),
   deleteRole: (id: number) => request.delete(`/system/roles/${id}`),
 
