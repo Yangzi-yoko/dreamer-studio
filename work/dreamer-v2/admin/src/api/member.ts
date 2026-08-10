@@ -58,4 +58,14 @@ export const memberApi = {
   createActivity: (data: any) => request.post<any, any>('/member/activities', data),
   updateActivity: (id: number, data: any) => request.put<any, any>(`/member/activities/${id}`, data),
   activityRegistrations: (id: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/activities/${id}/registrations`, { params: { page, pageSize } }),
+
+  pointMallPage: (page: number, pageSize: number) => request.get<any, any>('/member/point-products/admin', { params: { page, pageSize } }),
+  createPointsProduct: (data: any) => request.post<any, any>('/member/point-products', data),
+  updatePointsProduct: (id: number, data: any) => request.put<any, any>(`/member/point-products/${id}`, data),
+  deletePointsProduct: (id: number) => request.delete<any, any>(`/member/point-products/${id}`),
+
+  pointOrdersPage: (page: number, pageSize: number, status?: string) => request.get<any, any>('/member/point-exchanges/admin', { params: { page, pageSize, status } }),
+  pointOrderShip: (id: number, data: any) => request.put<any, any>(`/member/point-exchanges/${id}/ship`, data),
+  pointOrderComplete: (id: number) => request.put<any, any>(`/member/point-exchanges/${id}/complete`, {}),
+  pointOrderCancel: (id: number, data: any) => request.put<any, any>(`/member/point-exchanges/${id}/cancel`, data),
 };

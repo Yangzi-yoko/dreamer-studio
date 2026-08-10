@@ -31,4 +31,9 @@ export const api = {
   couponCards: () => request.get<any, any>('/member/coupons/mine/cards'),
   myCoupons: () => request.get<any, any>('/member/coupons/mine'),
   referralCode: (memberId: number) => request.get<any, any>(`/member/referral/code/${memberId}`),
+
+  pointMall: () => request.get<any, any>('/member/point-products/mall'),
+  pointMallDetail: (id: number) => request.get<any, any>(`/member/point-products/mall/${id}`),
+  pointExchange: (data: any) => request.post<any, any>('/member/point-exchanges', data),
+  myPointExchanges: (page = 1, pageSize = 10) => request.get<any, any>('/member/point-exchanges/mine', { params: { page, pageSize } }),
 };

@@ -28,6 +28,8 @@ const routes: RouteRecordRaw[] = [
     { path: 'member/birthday', name: 'BirthdayGift', component: () => import('../views/member/BirthdayGift.vue') },
     { path: 'member/referral', name: 'ReferralManage', component: () => import('../views/member/ReferralManage.vue') },
     { path: 'member/activities', name: 'ActivityManage', component: () => import('../views/member/ActivityManage.vue') },
+    { path: 'member/points-mall', name: 'PointsMallManage', component: () => import('../views/member/PointsMallManage.vue') },
+    { path: 'member/points-orders', name: 'PointsExchangeOrders', component: () => import('../views/member/PointsExchangeOrders.vue') },
     { path: 'member/:id', name: 'MemberDetail', component: () => import('../views/member/MemberDetail.vue') },
   ]},
 ];

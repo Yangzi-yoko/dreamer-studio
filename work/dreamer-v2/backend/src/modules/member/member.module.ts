@@ -50,11 +50,18 @@ import { MemberActivityController } from './member-activity.controller';
 import { RechargeOrder } from './entities/recharge-order.entity';
 import { RechargeOrderService } from './recharge-order.service';
 import { RechargeOrderController } from './recharge-order.controller';
+import { PointsProduct } from './entities/points-product.entity';
+import { PointsExchangeOrder } from './entities/points-exchange-order.entity';
+import { PointsProductService } from './points-product.service';
+import { PointsProductController } from './points-product.controller';
+import { PointsExchangeService } from './points-exchange.service';
+import { PointsExchangeMemberController } from './points-exchange.member.controller';
+import { PointsExchangeController } from './points-exchange.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController],
-  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService, RechargeOrderService],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder, PointsProduct, PointsExchangeOrder]), SystemModule],
+  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController, PointsProductController, PointsExchangeMemberController, PointsExchangeController],
+  providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService, RechargeOrderService, PointsProductService, PointsExchangeService],
   exports: [MemberService],
 })
 export class MemberModule {}
