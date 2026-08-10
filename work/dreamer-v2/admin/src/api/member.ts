@@ -70,4 +70,10 @@ export const memberApi = {
   pointOrderShip: (id: number, data: any) => request.put<any, any>(`/member/point-exchanges/${id}/ship`, data),
   pointOrderComplete: (id: number) => request.put<any, any>(`/member/point-exchanges/${id}/complete`, {}),
   pointOrderCancel: (id: number, data: any) => request.put<any, any>(`/member/point-exchanges/${id}/cancel`, data),
+
+  pointCouponPage: (page: number, pageSize: number) => request.get<any, any>('/member/point-coupons/admin', { params: { page, pageSize } }),
+  pointCouponLogs: (page: number, pageSize: number) => request.get<any, any>('/member/point-coupons/logs', { params: { page, pageSize } }),
+  createPointsCoupon: (data: any) => request.post<any, any>('/member/point-coupons', data),
+  updatePointsCoupon: (id: number, data: any) => request.put<any, any>(`/member/point-coupons/${id}`, data),
+  deletePointsCoupon: (id: number) => request.delete<any, any>(`/member/point-coupons/${id}`),
 };

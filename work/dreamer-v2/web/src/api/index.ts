@@ -40,4 +40,8 @@ export const api = {
   pointMallDetail: (id: number) => request.get<any, any>(`/member/point-products/mall/${id}`),
   pointExchange: (data: any) => request.post<any, any>('/member/point-exchanges', data),
   myPointExchanges: (page = 1, pageSize = 10) => request.get<any, any>('/member/point-exchanges/mine', { params: { page, pageSize } }),
+
+  pointCouponMall: () => request.get<any, any>('/member/point-coupons/mall'),
+  pointCouponRedeem: (id: number) => request.post<any, any>('/member/point-coupons/redeem', { id }),
+  myPointCoupons: (page = 1, pageSize = 10) => request.get<any, any>('/member/point-coupons/mine', { params: { page, pageSize } }),
 };

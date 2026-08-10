@@ -6,6 +6,10 @@ const orders = ref<any[]>([]);
 const total = ref(0);
 const page = ref(1);
 
+const coupons = ref<any[]>([]);
+const couponTotal = ref(0);
+const couponPage = ref(1);
+
 const statusText: Record<string, string> = {
   pending: '待发货',
   shipped: '已发货',
@@ -19,22 +23,59 @@ const statusType: Record<string, string> = {
   cancelled: 'info',
 };
 
+function couponText(c: any) {
+  if (!c) return '';
+  if (c.couponType === 'amount') return `${c.couponValue}元券`;
+  return `${(c.couponValue / 10).toFixed(1)}折券`;
+}
+
 async function load() {
   const res: any = await api.myPointExchanges(page.value, 10);
   orders.value = res.list || [];
   total.value = res.total || 0;
 }
 
-onMounted(load);
+async function loadCoupons() {
+  const res: any = await api.myPointCoupons(couponPage.value, 10);
+  coupons.value = res.list || [];
+  couponTotal.value = res.total || 0;
+}
+
+onMounted(() => {
+  load();
+  loadCoupons();
+});
 </script>
 
 <template>
   <div style="padding: 16px">
     <div style="display: flex; justify-content: space-between; align-items: center">
       <h2 style="margin: 0">我的兑换</h2>
-      <el-button text @click="page = 1; load()">刷新</el-button>
+      <el-button text @click="page = 1; couponPage = 1; load(); loadCoupons()">刷新</el-button>
     </div>
 
+    <h3 style="margin-top: 12px">兑换的优惠券</h3>
+    <div v-for="c in coupons" :key="c.id" class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-weight: 600">{{ c.couponName }}</span>
+        <span style="color: #909399; font-size: 12px">{{ couponText(c) }}</span>
+      </div>
+      <div style="color: #f56c6c; margin-top: 6px">{{ c.point }} 积分</div>
+      <div style="color: #909399; font-size: 12px; margin-top: 4px">{{ c.createdAt }}</div>
+    </div>
+    <el-empty v-if="!coupons.length" description="暂无兑换的优惠券" />
+    <el-pagination
+      v-if="couponTotal > 10"
+      v-model:current-page="couponPage"
+      :page-size="10"
+      :total="couponTotal"
+      layout="prev, pager, next"
+      small
+      style="margin-top: 12px"
+      @current-change="loadCoupons"
+    />
+
+    <h3 style="margin-top: 16px">实物兑换订单</h3>
     <div v-for="o in orders" :key="o.id" class="card">
       <div style="display: flex; justify-content: space-between; align-items: center">
         <span style="font-weight: 600">{{ o.productName }}</span>

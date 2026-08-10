@@ -30,6 +30,7 @@ const routes: RouteRecordRaw[] = [
     { path: 'member/activities', name: 'ActivityManage', component: () => import('../views/member/ActivityManage.vue') },
     { path: 'member/points-mall', name: 'PointsMallManage', component: () => import('../views/member/PointsMallManage.vue') },
     { path: 'member/points-orders', name: 'PointsExchangeOrders', component: () => import('../views/member/PointsExchangeOrders.vue') },
+    { path: 'member/points-coupons', name: 'PointsCouponManage', component: () => import('../views/member/PointsCouponManage.vue') },
     { path: 'member/:id', name: 'MemberDetail', component: () => import('../views/member/MemberDetail.vue') },
   ]},
 ];
