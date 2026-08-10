@@ -10,8 +10,12 @@ export class MemberActivityController {
   constructor(private readonly activityService: MemberActivityService) {}
 
   @Get()
-  pagePublished(@Query('page') page = 1, @Query('pageSize') pageSize = 10) {
-    return this.activityService.pagePublished(Number(page), Number(pageSize));
+  pagePublished(
+    @Query('page') page = 1,
+    @Query('pageSize') pageSize = 10,
+    @Query('memberId') memberId?: number,
+  ) {
+    return this.activityService.pagePublished(Number(page), Number(pageSize), memberId ? Number(memberId) : undefined);
   }
 
   @Post(':id/register')

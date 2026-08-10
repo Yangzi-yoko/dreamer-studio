@@ -26,4 +26,16 @@ export class SaveActivityDto {
 
   @IsIn(['draft', 'published', 'ended'])
   status!: string;
+
+  @IsOptional()
+  @IsIn(['all', 'tag', 'member'])
+  visibilityType?: string;
+
+  @IsOptional()
+  @IsInt({ each: true })
+  visibleTagIds?: number[];
+
+  @IsOptional()
+  @IsInt({ each: true })
+  visibleMemberIds?: number[];
 }

@@ -26,6 +26,9 @@ export class Activity {
   @Column({ length: 10, default: 'draft' })
   status!: string;
 
+  @Column({ name: 'visibility_type', length: 10, default: 'all' })
+  visibilityType!: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 }

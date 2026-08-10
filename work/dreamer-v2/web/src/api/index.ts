@@ -17,7 +17,7 @@ export const api = {
   createItemRental: (data: any) => request.post<any, any>('/rental/item-rentals', data),
   myItemRentals: (phone: string) => request.get<any, any>('/rental/item-rentals/my', { params: { phone } }),
 
-  activities: (page = 1, pageSize = 20) => request.get<any, any>('/member/activities', { params: { page, pageSize } }),
+  activities: (page = 1, pageSize = 20, memberId?: number) => request.get<any, any>('/member/activities', { params: { page, pageSize, memberId } }),
   registerActivity: (id: number, memberId: number) => request.post<any, any>(`/member/activities/${id}/register`, { memberId }),
 
   memberPoints: () => request.get<any, any>('/member/points/me'),

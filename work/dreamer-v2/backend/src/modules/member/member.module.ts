@@ -43,6 +43,8 @@ import { MemberReferralService } from './member-referral.service';
 import { MemberReferralController } from './member-referral.controller';
 import { Activity } from './entities/activity.entity';
 import { ActivityRegistration } from './entities/activity-registration.entity';
+import { ActivityVisibleTag } from './entities/activity-visible-tag.entity';
+import { ActivityVisibleMember } from './entities/activity-visible-member.entity';
 import { MemberActivityService } from './member-activity.service';
 import { MemberActivityController } from './member-activity.controller';
 import { RechargeOrder } from './entities/recharge-order.entity';
@@ -50,7 +52,7 @@ import { RechargeOrderService } from './recharge-order.service';
 import { RechargeOrderController } from './recharge-order.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, RechargeOrder]), SystemModule],
+  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder]), SystemModule],
   controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController],
   providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService, RechargeOrderService],
   exports: [MemberService],
