@@ -39,8 +39,13 @@ export class AdminService extends BaseService<AdminUser> {
       take: pageSize,
       skip: (page - 1) * pageSize,
       order: { createdAt: 'DESC' } as any,
+      relations: { roles: true },
     });
-    return { list: list.map((admin) => this.toSafeAdmin(admin)) as unknown as TReturn[], total, page, pageSize };
+    const items = list.map((admin) => {
+      const { passwordHash, ...safe } = admin;
+      return { ...safe, roles: (admin.roles ?? []).map((r) => ({ id: r.id, code: r.code, name: r.name })) };
+    });
+    return { list: items as unknown as TReturn[], total, page, pageSize };
   }
 
   async createAdmin(operator: { isSuper: boolean }, dto: CreateAdminDto): Promise<SafeAdmin> {

@@ -15,6 +15,7 @@ export const systemApi = {
   deleteRole: (id: number) => request.delete(`/system/roles/${id}`),
 
   menuPage: (page: number, pageSize: number) => request.get('/system/menus', { params: { page, pageSize } }),
+  menuTree: () => request.get('/system/menus/tree'),
   createMenu: (data: any) => request.post('/system/menus', data),
   updateMenu: (id: number, data: any) => request.put(`/system/menus/${id}`, data),
   deleteMenu: (id: number) => request.delete(`/system/menus/${id}`),

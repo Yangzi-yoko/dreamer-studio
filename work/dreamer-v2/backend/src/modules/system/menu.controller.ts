@@ -4,6 +4,7 @@ import { PermissionsGuard } from './permissions.guard';
 import { Permissions } from './permissions.decorator';
 import { MenuService } from './menu.service';
 import { Menu } from './entities/menu.entity';
+import { SaveMenuDto } from './dto/save-menu.dto';
 import { BaseController } from '../../common/base/base.controller';
 import { PageResult } from '../../common/base/page-result';
 
@@ -20,6 +21,12 @@ export class MenuController extends BaseController<Menu> {
     return super.page(page, pageSize);
   }
 
+  @Get('tree')
+  @Permissions('system:menu:list')
+  tree(): Promise<Menu[]> {
+    return this.menuService.tree();
+  }
+
   @Get(':id')
   @Permissions('system:menu:list')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Menu> {
@@ -28,19 +35,20 @@ export class MenuController extends BaseController<Menu> {
 
   @Post()
   @Permissions('system:menu:create')
-  create(@Body() dto: Partial<Menu>): Promise<Menu> {
+  create(@Body() dto: SaveMenuDto): Promise<Menu> {
     return super.create(dto);
   }
 
   @Put(':id')
   @Permissions('system:menu:update')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: Partial<Menu>): Promise<Menu> {
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: SaveMenuDto): Promise<Menu> {
     return super.update(id, dto);
   }
 
   @Delete(':id')
   @Permissions('system:menu:delete')
   async remove(@Param('id', ParseIntPipe) id: number): Promise<{ id: number }> {
-    return super.remove(id);
+    await this.menuService.remove(id);
+    return { id };
   }
 }
