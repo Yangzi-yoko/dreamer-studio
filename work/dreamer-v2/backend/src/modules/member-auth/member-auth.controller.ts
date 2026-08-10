@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Headers, Post, UseGuards } from '@nestjs/common';
-import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 import { MemberAuthService } from './member-auth.service';
 import { MemberAuthGuard } from './member-auth.guard';
 import { CurrentMember, CurrentMemberPayload } from './current-member.decorator';
@@ -22,6 +22,11 @@ class RegisterDto {
   @IsNotEmpty()
   @MaxLength(64)
   nickname!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  inviteCode?: string;
 }
 
 class LoginDto {

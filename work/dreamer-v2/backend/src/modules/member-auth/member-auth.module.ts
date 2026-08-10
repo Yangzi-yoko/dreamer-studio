@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Member } from '../member/entities/member.entity';
+import { MemberModule } from '../member/member.module';
 import { MemberAuthService } from './member-auth.service';
 import { MemberAuthController } from './member-auth.controller';
 import { MemberAuthGuard } from './member-auth.guard';
@@ -10,6 +11,7 @@ import { MemberAuthGuard } from './member-auth.guard';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Member]),
+    MemberModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

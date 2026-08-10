@@ -1,8 +1,8 @@
 import request from './request';
 
 export const api = {
-  register: (phone: string, username: string, password: string, nickname: string) =>
-    request.post<any, any>('/member-auth/register', { phone, username, password, nickname }),
+  register: (phone: string, username: string, password: string, nickname: string, inviteCode?: string) =>
+    request.post<any, any>('/member-auth/register', { phone, username, password, nickname, ...(inviteCode ? { inviteCode } : {}) }),
   login: (username: string, password: string) =>
     request.post<any, any>('/member-auth/login', { username, password }),
   me: () => request.get<any, any>('/member-auth/me'),
@@ -31,6 +31,10 @@ export const api = {
   couponCards: () => request.get<any, any>('/member/coupons/mine/cards'),
   myCoupons: () => request.get<any, any>('/member/coupons/mine'),
   referralCode: (memberId: number) => request.get<any, any>(`/member/referral/code/${memberId}`),
+  referralSummary: () => request.get<any, any>('/member/referral/me'),
+  referralTeam: (page = 1, pageSize = 10) => request.get<any, any>('/member/referral/me/team', { params: { page, pageSize } }),
+  myReferralRewards: (page = 1, pageSize = 10) => request.get<any, any>('/member/referral/me/rewards', { params: { page, pageSize } }),
+  bindReferral: (code: string) => request.post<any, any>('/member/referral/bind', { code }),
 
   pointMall: () => request.get<any, any>('/member/point-products/mall'),
   pointMallDetail: (id: number) => request.get<any, any>(`/member/point-products/mall/${id}`),

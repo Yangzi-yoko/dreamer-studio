@@ -53,14 +53,119 @@ export class MemberReferralService {
     }));
   }
 
-  async pageRewards(memberId: number, page = 1, pageSize = 10): Promise<{ list: ReferralReward[]; total: number; page: number; pageSize: number }> {
+  async summary(memberId: number) {
+    const code = await this.getMyCode(memberId);
+    const invitedCount = await this.relRepo.countBy({ referrerMemberId: memberId });
+    const [totalRow] = await this.rewardRepo.manager.query(
+      'SELECT COALESCE(SUM(reward_cents), 0) AS total FROM referral_reward WHERE referrer_member_id = ?',
+      [memberId],
+    );
+    const inviterRel = await this.relRepo.findOneBy({ inviteeMemberId: memberId });
+    let inviter: { memberId: number; nickname: string } | null = null;
+    if (inviterRel) {
+      const m = await this.memberRepo.findOneBy({ id: inviterRel.referrerMemberId });
+      if (m) inviter = { memberId: m.id, nickname: m.nickname || '' };
+    }
+    const rule = await this.ruleRepo.findOneBy({ enabled: true });
+    return {
+      code,
+      invitedCount,
+      totalRewardCents: Number(totalRow?.total || 0),
+      inviter,
+      rule: rule ? { percent: rule.percent, fixedCents: rule.fixedCents } : null,
+    };
+  }
+
+  private async memberNames(ids: number[]): Promise<Map<number, { nickname: string; phone: string }>> {
+    const map = new Map<number, { nickname: string; phone: string }>();
+    const unique = [...new Set(ids)];
+    if (!unique.length) return map;
+    const rows: any[] = await this.relRepo.manager.query(
+      `SELECT id, nickname, phone FROM member WHERE id IN (${unique.join(',')})`,
+    );
+    for (const r of rows || []) {
+      map.set(Number(r.id), { nickname: r.nickname || '', phone: r.phone || '' });
+    }
+    return map;
+  }
+
+  async team(memberId: number, page = 1, pageSize = 10) {
+    const [list, total] = await this.relRepo.findAndCount({
+      where: { referrerMemberId: memberId },
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    const names = await this.memberNames(list.map((r) => r.inviteeMemberId));
+    return {
+      list: list.map((r) => ({
+        id: r.id,
+        inviteeMemberId: r.inviteeMemberId,
+        inviteeNickname: names.get(r.inviteeMemberId)?.nickname || '',
+        inviteePhone: names.get(r.inviteeMemberId)?.phone || '',
+        createdAt: r.createdAt,
+      })),
+      total,
+      page,
+      pageSize,
+    };
+  }
+
+  async pageRewards(memberId: number, page = 1, pageSize = 10) {
     const [list, total] = await this.rewardRepo.findAndCount({
       where: { referrerMemberId: memberId },
       take: pageSize,
       skip: (page - 1) * pageSize,
       order: { createdAt: 'DESC' },
     });
-    return { list, total, page, pageSize };
+    const names = await this.memberNames(list.map((r) => r.inviteeMemberId));
+    return {
+      list: list.map((r) => ({ ...r, inviteeNickname: names.get(r.inviteeMemberId)?.nickname || '' })),
+      total,
+      page,
+      pageSize,
+    };
+  }
+
+  async pageAllRelations(page = 1, pageSize = 10) {
+    const [list, total] = await this.relRepo.findAndCount({
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    const names = await this.memberNames(list.flatMap((r) => [r.referrerMemberId, r.inviteeMemberId]));
+    return {
+      list: list.map((r) => ({
+        id: r.id,
+        referrerMemberId: r.referrerMemberId,
+        referrerNickname: names.get(r.referrerMemberId)?.nickname || '',
+        inviteeMemberId: r.inviteeMemberId,
+        inviteeNickname: names.get(r.inviteeMemberId)?.nickname || '',
+        createdAt: r.createdAt,
+      })),
+      total,
+      page,
+      pageSize,
+    };
+  }
+
+  async pageAllRewards(page = 1, pageSize = 10) {
+    const [list, total] = await this.rewardRepo.findAndCount({
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+      order: { createdAt: 'DESC' },
+    });
+    const names = await this.memberNames(list.flatMap((r) => [r.referrerMemberId, r.inviteeMemberId]));
+    return {
+      list: list.map((r) => ({
+        ...r,
+        referrerNickname: names.get(r.referrerMemberId)?.nickname || '',
+        inviteeNickname: names.get(r.inviteeMemberId)?.nickname || '',
+      })),
+      total,
+      page,
+      pageSize,
+    };
   }
 
   async getRule(): Promise<ReferralRule | null> {

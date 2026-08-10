@@ -5,13 +5,11 @@ import { ElMessage } from 'element-plus';
 import { api } from '../../api';
 
 const router = useRouter();
-const memberId = Number(localStorage.getItem('member_id')) || 0;
 const phone = localStorage.getItem('member_phone') || '';
 const points = ref(0);
 const wallet = ref(0);
 const packages = ref<any[]>([]);
 const coupons = ref<any[]>([]);
-const referralCode = ref('');
 const packageNames = ref<Record<number, string>>({});
 
 onMounted(async () => {
@@ -33,9 +31,6 @@ onMounted(async () => {
   try {
     coupons.value = (await api.myCoupons()) as any[];
   } catch {}
-  try {
-    referralCode.value = (await api.referralCode(memberId)) as string;
-  } catch {}
 });
 </script>
 
@@ -50,6 +45,7 @@ onMounted(async () => {
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/packages')">次卡商城</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" type="primary" plain @click="router.push('/member/points-mall')">积分商城</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/points-orders')">我的兑换</el-button>
+      <el-button style="flex: 1; min-width: calc(33% - 6px)" type="primary" plain @click="router.push('/member/referral')">邀请有礼</el-button>
     </div>
     <h3>我的次卡</h3>
     <div v-for="p in packages" :key="p.id" class="card">
@@ -57,8 +53,6 @@ onMounted(async () => {
     </div>
     <h3>我的优惠券</h3>
     <div v-for="c in coupons" :key="c.id" class="card">券 #{{ c.couponId }} · {{ c.status }}</div>
-    <h3>我的邀请码</h3>
-    <div class="card">{{ referralCode }}</div>
   </div>
 </template>
 

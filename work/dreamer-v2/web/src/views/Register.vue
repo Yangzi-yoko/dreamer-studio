@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { useAuthStore } from '../stores/auth';
 
+const route = useRoute();
 const router = useRouter();
 const store = useAuthStore();
 const loading = ref(false);
-const form = reactive({ phone: '', username: '', password: '', nickname: '' });
+const form = reactive({
+  phone: '',
+  username: '',
+  password: '',
+  nickname: '',
+  inviteCode: (route.query.inviteCode as string) || '',
+});
 
 async function submit() {
   if (!/^1\d{10}$/.test(form.phone)) {
@@ -28,7 +35,7 @@ async function submit() {
   }
   loading.value = true;
   try {
-    await store.register(form.phone, form.username.trim(), form.password, form.nickname.trim());
+    await store.register(form.phone, form.username.trim(), form.password, form.nickname.trim(), form.inviteCode.trim() || undefined);
     ElMessage.success('注册成功');
     router.push('/home');
   } catch (e: any) {
@@ -54,6 +61,9 @@ async function submit() {
       </el-form-item>
       <el-form-item>
         <el-input v-model="form.nickname" placeholder="昵称" />
+      </el-form-item>
+      <el-form-item>
+        <el-input v-model="form.inviteCode" placeholder="邀请码（选填）" maxlength="16" />
       </el-form-item>
       <el-button type="primary" style="width: 100%" :loading="loading" @click="submit">注册</el-button>
     </el-form>

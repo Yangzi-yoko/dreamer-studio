@@ -62,6 +62,6 @@ import { PointsExchangeController } from './points-exchange.controller';
   imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder, PointsProduct, PointsExchangeOrder]), SystemModule],
   controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController, PointsProductController, PointsExchangeMemberController, PointsExchangeController],
   providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService, RechargeOrderService, PointsProductService, PointsExchangeService],
-  exports: [MemberService],
+  exports: [MemberService, MemberReferralService],
 })
 export class MemberModule {}

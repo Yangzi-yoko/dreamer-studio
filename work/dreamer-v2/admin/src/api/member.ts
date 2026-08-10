@@ -52,6 +52,8 @@ export const memberApi = {
 
   referralRule: () => request.get<any, any>('/member/referral/rule'),
   updateReferralRule: (data: any) => request.put<any, any>('/member/referral/rule', data),
+  referralRelations: (page = 1, pageSize = 10) => request.get<any, any>('/member/referral/relations', { params: { page, pageSize } }),
+  referralRewardsAll: (page = 1, pageSize = 10) => request.get<any, any>('/member/referral/rewards', { params: { page, pageSize } }),
   referralRewards: (memberId: number, page = 1, pageSize = 10) => request.get<any, any>(`/member/referral/rewards/${memberId}`, { params: { page, pageSize } }),
 
   activityPage: (page: number, pageSize: number) => request.get<any, any>('/member/activities/admin', { params: { page, pageSize } }),

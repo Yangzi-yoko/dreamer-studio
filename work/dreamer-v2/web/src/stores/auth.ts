@@ -16,8 +16,8 @@ export const useAuthStore = defineStore('auth', {
       localStorage.setItem('member_phone', res.member.phone);
       localStorage.setItem('member_username', res.member.username);
     },
-    async register(phone: string, username: string, password: string, nickname: string) {
-      const res = await api.register(phone, username, password, nickname);
+    async register(phone: string, username: string, password: string, nickname: string, inviteCode?: string) {
+      const res = await api.register(phone, username, password, nickname, inviteCode);
       this.token = res.accessToken;
       this.member = res.member;
       localStorage.setItem('member_token', res.accessToken);
