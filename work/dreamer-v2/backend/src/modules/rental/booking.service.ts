@@ -64,6 +64,12 @@ export class BookingService {
 
   async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number }, member?: MemberIdentity): Promise<any> {
     const memberId = resolveMemberId(dto, member);
+    const previewDate = parseDate(dto.bookingDate);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (previewDate < todayStart) {
+      throw new BusinessException('不能预订过去的日期', 40020);
+    }
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
     const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });

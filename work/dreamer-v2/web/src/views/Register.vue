@@ -14,6 +14,7 @@ const form = reactive({
   password: '',
   nickname: '',
   inviteCode: (route.query.inviteCode as string) || '',
+  agree: false,
 });
 
 async function submit() {
@@ -25,12 +26,16 @@ async function submit() {
     ElMessage.warning('账号至少 2 个字符');
     return;
   }
-  if (!form.password || form.password.length < 6) {
-    ElMessage.warning('密码至少 6 位');
+  if (!form.password || form.password.length < 8 || !/(?=.*[A-Za-z])(?=.*\d)/.test(form.password)) {
+    ElMessage.warning('密码至少 8 位，且需同时包含字母和数字');
     return;
   }
   if (!form.nickname.trim()) {
     ElMessage.warning('请输入昵称');
+    return;
+  }
+  if (!form.agree) {
+    ElMessage.warning('请先阅读并同意服务条款');
     return;
   }
   loading.value = true;
@@ -57,13 +62,18 @@ async function submit() {
         <el-input v-model="form.username" placeholder="账号（至少 2 个字符）" maxlength="64" />
       </el-form-item>
       <el-form-item>
-        <el-input v-model="form.password" type="password" placeholder="密码（至少 6 位）" maxlength="64" show-password />
+        <el-input v-model="form.password" type="password" placeholder="密码（至少 8 位，含字母和数字）" maxlength="64" show-password />
       </el-form-item>
       <el-form-item>
         <el-input v-model="form.nickname" placeholder="昵称" />
       </el-form-item>
       <el-form-item>
         <el-input v-model="form.inviteCode" placeholder="邀请码（选填）" maxlength="16" />
+      </el-form-item>
+      <el-form-item style="margin-bottom: 8px">
+        <el-checkbox v-model="form.agree">
+          我已阅读并同意《服务条款》与《隐私政策》
+        </el-checkbox>
       </el-form-item>
       <el-button type="primary" style="width: 100%" :loading="loading" @click="submit">注册</el-button>
     </el-form>

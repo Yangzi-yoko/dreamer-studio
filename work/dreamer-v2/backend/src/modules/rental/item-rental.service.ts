@@ -30,6 +30,9 @@ export class ItemRentalService {
     const start = parseDate(dto.startDate);
     const end = parseDate(dto.endDate);
     if (end < start) throw new BusinessException('结束日期不能早于开始日期', 40023);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (start < todayStart) throw new BusinessException('不能租赁过去的日期', 40025);
     const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
     const units = dto.billingType === 'day' ? days : dto.slotCount;
     if (units <= 0) throw new BusinessException('租期不合法', 40024);

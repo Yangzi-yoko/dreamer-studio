@@ -16,13 +16,12 @@ onMounted(async () => {
 });
 
 async function register() {
-  const memberId = Number(sessionStorage.getItem('member_id'));
-  if (!memberId) {
+  if (!sessionStorage.getItem('member_token')) {
     ElMessage.warning('请先登录');
     return;
   }
   try {
-    await api.registerActivity(id, memberId);
+    await api.registerActivity(id);
     ElMessage.success('报名成功');
   } catch (e: any) {
     ElMessage.error(e.message || '报名失败');

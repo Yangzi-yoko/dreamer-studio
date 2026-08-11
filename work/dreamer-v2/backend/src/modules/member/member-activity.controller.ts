@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
+import { MemberAuthGuard } from '../member-auth/member-auth.guard';
+import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
 import { MemberActivityService } from './member-activity.service';
 import { SaveActivityDto } from './dto/save-activity.dto';
 
@@ -18,9 +20,10 @@ export class MemberActivityController {
     return this.activityService.pagePublished(Number(page), Number(pageSize), memberId ? Number(memberId) : undefined);
   }
 
+  @UseGuards(MemberAuthGuard)
   @Post(':id/register')
-  register(@Param('id', ParseIntPipe) id: number, @Body() dto: { memberId: number }) {
-    return this.activityService.register(dto.memberId, id);
+  register(@Param('id', ParseIntPipe) id: number, @CurrentMember() member: CurrentMemberPayload) {
+    return this.activityService.register(member.memberId, id);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)

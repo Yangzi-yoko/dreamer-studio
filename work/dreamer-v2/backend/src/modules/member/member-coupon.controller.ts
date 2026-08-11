@@ -8,22 +8,9 @@ import { SaveCouponDto } from './dto/save-coupon.dto';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
 
-@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('member/coupons')
 export class MemberCouponController {
   constructor(private readonly couponService: MemberCouponService) {}
-
-  @Get()
-  @Permissions('member:coupon:list')
-  page(@Query('page') page = 1, @Query('pageSize') pageSize = 10) {
-    return this.couponService.pageCoupons(Number(page), Number(pageSize));
-  }
-
-  @Get('users')
-  @Permissions('member:coupon:list')
-  users(@Query('memberId', ParseIntPipe) memberId: number) {
-    return this.couponService.pageUserCoupons(memberId);
-  }
 
   @UseGuards(MemberAuthGuard)
   @Get('mine')
@@ -37,33 +24,52 @@ export class MemberCouponController {
     return this.couponService.usableCards(member.memberId);
   }
 
-  @Post()
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('member:coupon:list')
+  @Get()
+  page(@Query('page') page = 1, @Query('pageSize') pageSize = 10) {
+    return this.couponService.pageCoupons(Number(page), Number(pageSize));
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('member:coupon:list')
+  @Get('users')
+  users(@Query('memberId', ParseIntPipe) memberId: number) {
+    return this.couponService.pageUserCoupons(memberId);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('member:coupon:create')
+  @Post()
   create(@Body() dto: SaveCouponDto) {
     return this.couponService.createCoupon(dto);
   }
 
-  @Put(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('member:coupon:update')
+  @Put(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: SaveCouponDto) {
     return this.couponService.updateCoupon(id, dto);
   }
 
-  @Delete(':id')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('member:coupon:delete')
+  @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.couponService.deleteCoupon(id);
     return { id };
   }
 
-  @Post(':couponId/issue')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('member:coupon:issue')
+  @Post(':couponId/issue')
   issue(@Param('couponId', ParseIntPipe) couponId: number, @Body() dto: { memberId: number }) {
     return this.couponService.issue(dto.memberId, couponId);
   }
 
-  @Post('users/:userCouponId/use')
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Permissions('member:coupon:list')
+  @Post('users/:userCouponId/use')
   use(@Param('userCouponId', ParseIntPipe) userCouponId: number, @Body() dto: { memberId: number; orderNo: string; amountYuan: number }) {
     if (!dto?.memberId) throw new BusinessException('缺少会员ID', 40030);
     if (!dto?.orderNo) throw new BusinessException('缺少订单号', 40030);

@@ -16,8 +16,9 @@ class RegisterDto {
   username!: string;
 
   @IsString()
-  @MinLength(6)
+  @MinLength(8)
   @MaxLength(64)
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d).+$/, { message: '密码至少 8 位，且需同时包含字母和数字' })
   password!: string;
 
   @IsString()
