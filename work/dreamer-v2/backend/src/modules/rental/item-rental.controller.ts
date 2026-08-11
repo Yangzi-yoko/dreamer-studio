@@ -5,6 +5,10 @@ import { Permissions } from '../system/permissions.decorator';
 import { ItemRentalService } from './item-rental.service';
 import { ItemRentalLifecycleService } from './item-rental-lifecycle.service';
 import { CreateItemRentalDto } from './dto/create-item-rental.dto';
+import { MemberAuthGuard } from '../member-auth/member-auth.guard';
+import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
+import { ThrottleGuard } from '../../common/throttle/throttle.guard';
+import { Throttle } from '../../common/throttle/throttle.decorator';
 
 @Controller('rental/item-rentals')
 export class ItemRentalController {
@@ -13,14 +17,18 @@ export class ItemRentalController {
     private readonly lifecycle: ItemRentalLifecycleService,
   ) {}
 
+  @UseGuards(MemberAuthGuard, ThrottleGuard)
+  @Throttle({ limit: 30, windowSeconds: 60 })
   @Post()
-  create(@Body() dto: CreateItemRentalDto) {
-    return this.itemRentalService.create(dto);
+  create(@Body() dto: CreateItemRentalDto, @CurrentMember() member?: CurrentMemberPayload) {
+    return this.itemRentalService.create(dto, member);
   }
 
+  @UseGuards(MemberAuthGuard, ThrottleGuard)
+  @Throttle({ limit: 20, windowSeconds: 60 })
   @Get('my')
-  my(@Query('phone') phone: string) {
-    return this.itemRentalService.pageByPhone(phone);
+  my(@CurrentMember() member?: CurrentMemberPayload) {
+    return this.itemRentalService.pageMy(member);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)

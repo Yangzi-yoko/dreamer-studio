@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { RedisService } from '../../common/redis/redis.service';
 import { BusinessException } from '../../common/exceptions/business.exception';
+import { resolveMemberId, MemberIdentity } from '../../common/security/member-binding.util';
+import { assertPagination } from '../../common/utils/pagination.utils';
 import { formatDate, isHoliday, isWeekend, parseDate } from '../../common/utils/date.utils';
 import { toYuan } from '../../common/utils/money.utils';
 import { computeCouponDeduct } from '../../common/utils/coupon.utils';
@@ -60,7 +62,8 @@ export class BookingService {
     return { uc, deductCents: computeCouponDeduct(coupon, amountCents), couponName: coupon.name };
   }
 
-  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number }): Promise<any> {
+  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number }, member?: MemberIdentity): Promise<any> {
+    const memberId = resolveMemberId(dto, member);
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
     const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });
@@ -78,8 +81,8 @@ export class BookingService {
       totalAmount: toYuan(totalAmount),
       deposit: toYuan(studio.depositCents),
     };
-    if (dto.memberId && dto.userCouponId) {
-      const { deductCents, couponName } = await this.resolveCoupon(dto.memberId, dto.userCouponId, totalAmount, {
+    if (memberId && dto.userCouponId) {
+      const { deductCents, couponName } = await this.resolveCoupon(memberId, dto.userCouponId, totalAmount, {
         userCoupon: this.userCouponRepo,
         coupon: this.couponRepo,
       });
@@ -93,7 +96,8 @@ export class BookingService {
     return result;
   }
 
-  async create(dto: CreateBookingDto): Promise<Booking> {
+  async create(dto: CreateBookingDto, member?: MemberIdentity): Promise<Booking> {
+    dto.memberId = resolveMemberId(dto, member);
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
 
@@ -234,6 +238,7 @@ export class BookingService {
   }
 
   async page(page = 1, pageSize = 10, status?: string): Promise<{ list: Booking[]; total: number; page: number; pageSize: number }> {
+    assertPagination(page, pageSize);
     const where = status ? { status } : {};
     const [list, total] = await this.bookingRepo.findAndCount({
       where,
@@ -244,8 +249,11 @@ export class BookingService {
     return { list, total, page, pageSize };
   }
 
-  async pageByPhone(phone: string): Promise<Booking[]> {
-    return this.bookingRepo.find({ where: { customerPhone: phone }, order: { createdAt: 'DESC' } });
+  async pageMy(member?: MemberIdentity): Promise<Booking[]> {
+    if (member?.memberId == null) {
+      throw new BusinessException('请先登录会员', 40100);
+    }
+    return this.bookingRepo.find({ where: { memberId: member.memberId }, order: { createdAt: 'DESC' } });
   }
 
   async calendar(studioId: number, month: string): Promise<any[]> {

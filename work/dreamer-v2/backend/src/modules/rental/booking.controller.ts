@@ -6,6 +6,11 @@ import { BookingService } from './booking.service';
 import { BookingLifecycleService } from './booking-lifecycle.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { PreviewBookingDto } from './dto/preview-booking.dto';
+import { MemberAuthGuard } from '../member-auth/member-auth.guard';
+import { MemberAuthOptionalGuard } from '../member-auth/member-auth-optional.guard';
+import { CurrentMember, CurrentMemberPayload } from '../member-auth/current-member.decorator';
+import { ThrottleGuard } from '../../common/throttle/throttle.guard';
+import { Throttle } from '../../common/throttle/throttle.decorator';
 
 @Controller('rental/bookings')
 export class BookingController {
@@ -14,19 +19,25 @@ export class BookingController {
     private readonly lifecycle: BookingLifecycleService,
   ) {}
 
+  @UseGuards(MemberAuthGuard, ThrottleGuard)
+  @Throttle({ limit: 30, windowSeconds: 60 })
   @Post()
-  create(@Body() dto: CreateBookingDto) {
-    return this.bookingService.create(dto);
+  create(@Body() dto: CreateBookingDto, @CurrentMember() member: CurrentMemberPayload) {
+    return this.bookingService.create(dto, member);
   }
 
+  @UseGuards(MemberAuthOptionalGuard, ThrottleGuard)
+  @Throttle({ limit: 60, windowSeconds: 60 })
   @Post('preview')
-  preview(@Body() dto: PreviewBookingDto) {
-    return this.bookingService.preview(dto);
+  preview(@Body() dto: PreviewBookingDto, @CurrentMember() member?: CurrentMemberPayload) {
+    return this.bookingService.preview(dto, member);
   }
 
+  @UseGuards(MemberAuthGuard, ThrottleGuard)
+  @Throttle({ limit: 30, windowSeconds: 60 })
   @Get('my')
-  my(@Query('phone') phone: string) {
-    return this.bookingService.pageByPhone(phone);
+  my(@CurrentMember() member: CurrentMemberPayload) {
+    return this.bookingService.pageMy(member);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)

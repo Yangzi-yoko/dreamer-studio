@@ -5,7 +5,7 @@ import { ElMessage } from 'element-plus';
 import { api } from '../../api';
 
 const router = useRouter();
-const phone = localStorage.getItem('member_phone') || '';
+const phone = sessionStorage.getItem('member_phone') || '';
 const points = ref(0);
 const wallet = ref(0);
 const packages = ref<any[]>([]);

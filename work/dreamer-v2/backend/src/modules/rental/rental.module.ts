@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SystemModule } from '../system/system.module';
+import { MemberAuthModule } from '../member-auth/member-auth.module';
+import { SecurityModule } from '../../common/security/security.module';
 import { Studio } from './entities/studio.entity';
 import { TimeSlot } from './entities/time-slot.entity';
 import { Booking } from './entities/booking.entity';
@@ -29,7 +31,7 @@ import { UserCoupon } from '../member/entities/user-coupon.entity';
 import { CouponUsage } from '../member/entities/coupon-usage.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental, MemberWallet, WalletLog, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage]), SystemModule],
+  imports: [TypeOrmModule.forFeature([Studio, TimeSlot, Booking, BookingTimeSlot, RentalItem, ItemRental, MemberWallet, WalletLog, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage]), SystemModule, MemberAuthModule, SecurityModule],
   controllers: [StudioController, TimeSlotController, BookingController, CalendarController, RentalItemController, ItemRentalController],
   providers: [StudioService, TimeSlotService, BookingService, BookingLifecycleService, RentalItemService, ItemRentalService, ItemRentalLifecycleService],
   exports: [StudioService],

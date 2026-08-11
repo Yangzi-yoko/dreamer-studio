@@ -11,11 +11,11 @@ export const api = {
   studioTimeSlots: (studioId: number) => request.get<any, any>(`/rental/studios/${studioId}/time-slots`),
   bookingPreview: (data: any) => request.post<any, any>('/rental/bookings/preview', data),
   createBooking: (data: any) => request.post<any, any>('/rental/bookings', data),
-  myBookings: (phone: string) => request.get<any, any>('/rental/bookings/my', { params: { phone } }),
+  myBookings: () => request.get<any, any>('/rental/bookings/my'),
 
   items: (page = 1, pageSize = 20) => request.get<any, any>('/rental/items', { params: { page, pageSize } }),
   createItemRental: (data: any) => request.post<any, any>('/rental/item-rentals', data),
-  myItemRentals: (phone: string) => request.get<any, any>('/rental/item-rentals/my', { params: { phone } }),
+  myItemRentals: () => request.get<any, any>('/rental/item-rentals/my'),
 
   activities: (page = 1, pageSize = 20, memberId?: number) => request.get<any, any>('/member/activities', { params: { page, pageSize, memberId } }),
   registerActivity: (id: number, memberId: number) => request.post<any, any>(`/member/activities/${id}/register`, { memberId }),

@@ -16,7 +16,7 @@ onMounted(async () => {
 });
 
 async function register() {
-  const memberId = Number(localStorage.getItem('member_id'));
+  const memberId = Number(sessionStorage.getItem('member_id'));
   if (!memberId) {
     ElMessage.warning('请先登录');
     return;

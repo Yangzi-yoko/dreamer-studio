@@ -16,4 +16,7 @@ export default () => ({
     secret: process.env.JWT_SECRET || 'change-me-in-production',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+  corsOrigins: process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((s) => s.trim()).filter(Boolean)
+    : [],
 });

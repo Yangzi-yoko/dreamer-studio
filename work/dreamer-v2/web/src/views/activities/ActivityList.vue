@@ -8,7 +8,7 @@ const list = ref<any[]>([]);
 
 onMounted(async () => {
   try {
-    const memberId = Number(localStorage.getItem('member_id')) || undefined;
+    const memberId = Number(sessionStorage.getItem('member_id')) || undefined;
     const res: any = await api.activities(1, 50, memberId);
     list.value = res.list || [];
   } catch {}

@@ -8,9 +8,10 @@ const route = useRoute();
 const router = useRouter();
 const itemId = Number(route.params.itemId);
 const item = ref<any>(null);
+const loggedIn = !!sessionStorage.getItem('member_token') && Number(sessionStorage.getItem('member_id')) > 0;
 const form = reactive({
   customerName: '',
-  customerPhone: localStorage.getItem('member_phone') || '',
+  customerPhone: sessionStorage.getItem('member_phone') || '',
   billingType: 'day' as 'day' | 'slot',
   quantity: 1,
   startDate: '',
@@ -27,6 +28,10 @@ onMounted(async () => {
 });
 
 async function submit() {
+  if (!loggedIn) {
+    ElMessage.warning('请先登录后再下单');
+    return;
+  }
   if (!form.customerName.trim() || !/^1\d{10}$/.test(form.customerPhone)) {
     ElMessage.warning('请填写正确的客户信息');
     return;
@@ -41,7 +46,6 @@ async function submit() {
       startDate: form.startDate,
       endDate: form.endDate || form.startDate,
       slotCount: form.billingType === 'slot' ? form.slotCount : 0,
-      memberId: Number(localStorage.getItem('member_id')) || undefined,
     });
     ElMessage.success('下单成功，待支付');
     router.push('/rentals');

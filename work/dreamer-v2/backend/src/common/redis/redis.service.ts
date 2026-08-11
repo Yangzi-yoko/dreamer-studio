@@ -44,10 +44,24 @@ export class RedisService implements OnModuleDestroy {
     await client.set(key, JSON.stringify(value), ttlSeconds ? { EX: ttlSeconds } : undefined);
   }
 
+  async incr(key: string, ttlSeconds?: number): Promise<number> {
+    const client = await this.getClient();
+    if (!client) return 0;
+    const count = await client.incr(key);
+    if (count === 1 && ttlSeconds) await client.expire(key, ttlSeconds);
+    return count;
+  }
+
   async del(key: string): Promise<void> {
     const client = await this.getClient();
     if (!client) return;
     await client.del(key);
+  }
+
+  async ttl(key: string): Promise<number> {
+    const client = await this.getClient();
+    if (!client) return -1;
+    return client.ttl(key);
   }
 
   async onModuleDestroy(): Promise<void> {

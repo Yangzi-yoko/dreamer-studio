@@ -18,6 +18,10 @@ export class ItemRental {
   @Column({ name: 'customer_phone', length: 20 })
   customerPhone!: string;
 
+  @Index()
+  @Column({ name: 'member_id', type: 'int', nullable: true })
+  memberId?: number;
+
   @Column({ name: 'billing_type', length: 8, default: 'day' })
   billingType!: 'day' | 'slot';
 

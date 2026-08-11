@@ -1,11 +1,13 @@
 import { Repository } from 'typeorm';
 import { BusinessException } from '../exceptions/business.exception';
+import { assertPagination } from '../utils/pagination.utils';
 import { PageResult } from './page-result';
 
 export class BaseService<T extends { id: any }> {
   constructor(protected readonly repo: Repository<T>) {}
 
   async page<TReturn = T>(page = 1, pageSize = 10): Promise<PageResult<TReturn>> {
+    assertPagination(page, pageSize);
     const [list, total] = await this.repo.findAndCount({
       take: pageSize,
       skip: (page - 1) * pageSize,

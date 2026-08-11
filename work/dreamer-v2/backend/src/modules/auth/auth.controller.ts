@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CurrentAdmin, CurrentAdminPayload } from './current-admin.decorator';
 import { AdminService } from '../system/admin.service';
+import { ThrottleGuard } from '../../common/throttle/throttle.guard';
+import { Throttle } from '../../common/throttle/throttle.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -12,9 +14,12 @@ export class AuthController {
     private readonly adminService: AdminService,
   ) {}
 
+  @UseGuards(ThrottleGuard)
+  @Throttle({ limit: 30, windowSeconds: 60 })
   @Post('login')
-  login(@Body() dto: LoginDto): Promise<{ accessToken: string; admin: any }> {
-    return this.authService.login(dto.username, dto.password);
+  login(@Body() dto: LoginDto, @Headers('x-forwarded-for') forwarded: string): Promise<{ accessToken: string; admin: any }> {
+    const ip = (forwarded || '').split(',')[0].trim() || undefined;
+    return this.authService.login(dto.username, dto.password, ip);
   }
 
   @UseGuards(JwtAuthGuard)

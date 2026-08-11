@@ -3,6 +3,8 @@ import { IsNotEmpty, IsOptional, IsString, Matches, MaxLength, MinLength } from 
 import { MemberAuthService } from './member-auth.service';
 import { MemberAuthGuard } from './member-auth.guard';
 import { CurrentMember, CurrentMemberPayload } from './current-member.decorator';
+import { ThrottleGuard } from '../../common/throttle/throttle.guard';
+import { Throttle } from '../../common/throttle/throttle.decorator';
 
 class RegisterDto {
   @Matches(/^1\d{10}$/)
@@ -54,9 +56,12 @@ export class MemberAuthController {
     return this.authService.register(dto, ip, fingerprint || 'unknown');
   }
 
+  @UseGuards(ThrottleGuard)
+  @Throttle({ limit: 30, windowSeconds: 60 })
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.username, dto.password);
+  login(@Body() dto: LoginDto, @Headers('x-forwarded-for') forwarded: string) {
+    const ip = (forwarded || '').split(',')[0].trim() || undefined;
+    return this.authService.login(dto.username, dto.password, ip);
   }
 
   @UseGuards(MemberAuthGuard)

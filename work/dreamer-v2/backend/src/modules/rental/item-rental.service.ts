@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { RedisService } from '../../common/redis/redis.service';
 import { BusinessException } from '../../common/exceptions/business.exception';
+import { resolveMemberId, MemberIdentity } from '../../common/security/member-binding.util';
+import { assertPagination } from '../../common/utils/pagination.utils';
 import { formatDate, parseDate } from '../../common/utils/date.utils';
 import { RentalItem } from './entities/rental-item.entity';
 import { ItemRental } from './entities/item-rental.entity';
@@ -17,7 +19,8 @@ export class ItemRentalService {
     private readonly redis: RedisService,
   ) {}
 
-  async create(dto: CreateItemRentalDto): Promise<ItemRental> {
+  async create(dto: CreateItemRentalDto, member?: MemberIdentity): Promise<ItemRental> {
+    dto.memberId = resolveMemberId(dto, member);
     const item = await this.itemRepo.findOne({ where: { id: dto.itemId, enabled: true } });
     if (!item) throw new BusinessException('商品不存在或已下架', 40400);
     if (dto.billingType !== item.billingType) {
@@ -59,6 +62,7 @@ export class ItemRentalService {
           itemId: lockedItem.id,
           customerName: dto.customerName,
           customerPhone: dto.customerPhone,
+          memberId: dto.memberId ?? null,
           billingType: dto.billingType,
           quantity: dto.quantity,
           startDate: dto.startDate,
@@ -78,6 +82,7 @@ export class ItemRentalService {
   }
 
   async page(page = 1, pageSize = 10, status?: string): Promise<{ list: ItemRental[]; total: number; page: number; pageSize: number }> {
+    assertPagination(page, pageSize);
     const where = status ? { status } : {};
     const [list, total] = await this.rentalRepo.findAndCount({
       where,
@@ -88,7 +93,10 @@ export class ItemRentalService {
     return { list, total, page, pageSize };
   }
 
-  async pageByPhone(phone: string): Promise<ItemRental[]> {
-    return this.rentalRepo.find({ where: { customerPhone: phone }, order: { createdAt: 'DESC' } });
+  async pageMy(member?: MemberIdentity): Promise<ItemRental[]> {
+    if (member?.memberId == null) {
+      throw new BusinessException('请先登录会员', 40100);
+    }
+    return this.rentalRepo.find({ where: { memberId: member.memberId }, order: { createdAt: 'DESC' } });
   }
 }

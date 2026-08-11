@@ -7,8 +7,8 @@ import { api } from '../../api';
 const route = useRoute();
 const router = useRouter();
 const studioId = Number(route.params.studioId);
-const memberId = Number(localStorage.getItem('member_id')) || 0;
-const loggedIn = !!localStorage.getItem('member_token') && memberId > 0;
+const memberId = Number(sessionStorage.getItem('member_id')) || 0;
+const loggedIn = !!sessionStorage.getItem('member_token') && memberId > 0;
 
 const slots = ref<any[]>([]);
 const studio = ref<any>(null);
@@ -20,7 +20,7 @@ const submitting = ref(false);
 
 const form = reactive({
   customerName: '',
-  customerPhone: localStorage.getItem('member_phone') || '',
+  customerPhone: sessionStorage.getItem('member_phone') || '',
   bookingDate: '',
   timeSlotIds: [] as number[],
   payMethod: 'wallet' as 'wallet' | 'package' | 'offline',
@@ -87,6 +87,10 @@ watch(
 );
 
 async function submit() {
+  if (!loggedIn) {
+    ElMessage.warning('请先登录后再下单');
+    return;
+  }
   if (!form.customerName.trim() || !/^1\d{10}$/.test(form.customerPhone)) {
     ElMessage.warning('请填写正确的客户信息');
     return;
@@ -113,7 +117,6 @@ async function submit() {
       timeSlotIds: form.timeSlotIds,
       payMethod: form.payMethod,
     };
-    if (memberId) payload.memberId = memberId;
     if (form.payMethod === 'package') payload.userPackageId = form.userPackageId;
     if (form.payMethod === 'wallet' && form.userCouponId) payload.userCouponId = form.userCouponId;
     await api.createBooking(payload);

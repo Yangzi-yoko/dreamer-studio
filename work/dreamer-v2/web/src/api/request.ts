@@ -6,7 +6,7 @@ const request = axios.create({
 });
 
 request.interceptors.request.use((config) => {
-  const token = localStorage.getItem('member_token');
+  const token = sessionStorage.getItem('member_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
