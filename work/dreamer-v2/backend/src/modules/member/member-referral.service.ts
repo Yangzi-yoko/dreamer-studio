@@ -34,6 +34,21 @@ export class MemberReferralService {
     if (referrer.id === inviteeMemberId) throw new BusinessException('不能邀请自己', 40054);
     const existing = await this.relRepo.findOneBy({ inviteeMemberId });
     if (existing) throw new BusinessException('已绑定推荐关系', 40053);
+
+    const hasDownline = await this.relRepo.findOneBy({ referrerMemberId: inviteeMemberId });
+    if (hasDownline) throw new BusinessException('已有下线会员，不能再绑定邀请码', 40056);
+
+    let cursor = referrer.id;
+    const visited = new Set<number>();
+    while (cursor) {
+      if (cursor === inviteeMemberId) throw new BusinessException('绑定会形成环，已拒绝', 40055);
+      if (visited.has(cursor)) break;
+      visited.add(cursor);
+      const up = await this.relRepo.findOneBy({ inviteeMemberId: cursor });
+      if (!up) break;
+      cursor = up.referrerMemberId;
+    }
+
     return this.relRepo.save(this.relRepo.create({ referrerMemberId: referrer.id, inviteeMemberId }));
   }
 

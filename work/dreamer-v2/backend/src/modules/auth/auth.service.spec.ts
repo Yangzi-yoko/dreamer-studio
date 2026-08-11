@@ -8,7 +8,8 @@ describe('AuthService', () => {
     findOneBy: jest.fn(),
   };
   const jwt: any = { sign: jest.fn(() => 'token-abc') };
-  const service = new AuthService(repo, jwt);
+  const throttle: any = { assertAllowed: jest.fn(async () => {}), onSuccess: jest.fn(), onFailure: jest.fn() };
+  const service = new AuthService(repo, jwt, throttle);
 
   it('throws when username not found', async () => {
     repo.findOneBy.mockResolvedValue(null);

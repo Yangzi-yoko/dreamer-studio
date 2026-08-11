@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
 import { RedisService } from '../../common/redis/redis.service';
 import { BusinessException } from '../../common/exceptions/business.exception';
 import { resolveMemberId, MemberIdentity } from '../../common/security/member-binding.util';
@@ -20,6 +21,9 @@ import { PackageUsage } from '../member/entities/package-usage.entity';
 import { Coupon } from '../member/entities/coupon.entity';
 import { UserCoupon } from '../member/entities/user-coupon.entity';
 import { CouponUsage } from '../member/entities/coupon-usage.entity';
+
+const MAX_PENDING_BOOKINGS_PER_MEMBER = 3;
+const PENDING_EXPIRE_HOURS = 24;
 
 @Injectable()
 export class BookingService {
@@ -106,6 +110,13 @@ export class BookingService {
     dto.memberId = resolveMemberId(dto, member);
     const studio = await this.studioRepo.findOneBy({ id: dto.studioId, enabled: true });
     if (!studio) throw new BusinessException('场地不存在或已下架', 40400);
+
+    if (dto.memberId) {
+      const pendingCount = await this.bookingRepo.countBy({ memberId: dto.memberId, status: 'pending' });
+      if (pendingCount >= MAX_PENDING_BOOKINGS_PER_MEMBER) {
+        throw new BusinessException(`待支付订单过多，请先支付或取消已有的 ${MAX_PENDING_BOOKINGS_PER_MEMBER} 笔订单`, 40048);
+      }
+    }
 
     const date = parseDate(dto.bookingDate);
     const today = new Date();
@@ -295,5 +306,17 @@ export class BookingService {
       occupiedTimeSlotIds: (byDate.get(date) || []).flatMap((b) => b.timeSlotIds),
       bookings: byDate.get(date) || [],
     }));
+  }
+
+  @Cron('0 * * * *')
+  async cronExpirePending(): Promise<void> {
+    const cutoff = new Date(Date.now() - PENDING_EXPIRE_HOURS * 3600 * 1000);
+    const stale = await this.bookingRepo.find({ where: { status: 'pending' } });
+    for (const b of stale) {
+      if (b.createdAt < cutoff) {
+        b.status = 'cancelled';
+        await this.bookingRepo.save(b);
+      }
+    }
   }
 }

@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../system/permissions.guard';
 import { Permissions } from '../system/permissions.decorator';
 import { MemberReferralService } from './member-referral.service';
+import { BusinessException } from '../../common/exceptions/business.exception';
 
 class BindDto {
   @IsString()
@@ -18,8 +19,10 @@ class BindDto {
 export class MemberReferralController {
   constructor(private readonly referralService: MemberReferralService) {}
 
+  @UseGuards(MemberAuthGuard)
   @Get('code/:memberId')
-  code(@Param('memberId', ParseIntPipe) memberId: number) {
+  code(@Param('memberId', ParseIntPipe) memberId: number, @CurrentMember() member: CurrentMemberPayload) {
+    if (member.memberId !== memberId) throw new BusinessException('无权查看其他会员的邀请码', 40300);
     return this.referralService.getMyCode(memberId);
   }
 

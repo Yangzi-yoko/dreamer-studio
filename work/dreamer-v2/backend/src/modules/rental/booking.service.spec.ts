@@ -120,7 +120,7 @@ describe('BookingService', () => {
     slotRepo.findBy.mockResolvedValue([{ id: 1, startTime: '09:00', endTime: '10:00' }]);
     userCouponRepo.findOneBy.mockResolvedValue({ id: 1, memberId: 5, couponId: 1, status: 'unused' });
     couponRepo.findOneBy.mockResolvedValue({ id: 1, type: 'amount', value: 1000, minSpendCents: 0, enabled: true, name: '满100减10' });
-    const res = await service.preview({ studioId: 1, bookingDate: '2026-08-19', timeSlotIds: [1], memberId: 5, userCouponId: 1 });
+    const res = await service.preview({ studioId: 1, bookingDate: '2026-08-19', timeSlotIds: [1], memberId: 5, userCouponId: 1 }, { memberId: 5 });
     expect(res.totalAmount).toBe(100);
     expect(res.deduct).toBe(10);
     expect(res.payable).toBe(90);

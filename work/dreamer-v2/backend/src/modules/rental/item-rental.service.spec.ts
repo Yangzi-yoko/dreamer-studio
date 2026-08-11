@@ -39,8 +39,8 @@ describe('ItemRentalService', () => {
       customerPhone: '13800000000',
       billingType: 'day',
       quantity: 2,
-      startDate: '2026-08-10',
-      endDate: '2026-08-12',
+      startDate: '2026-09-10',
+      endDate: '2026-09-12',
       slotCount: 0,
     };
     const res = await service.create(dto as any);
@@ -65,8 +65,8 @@ describe('ItemRentalService', () => {
       customerPhone: '13800000000',
       billingType: 'day',
       quantity: 3,
-      startDate: '2026-08-10',
-      endDate: '2026-08-11',
+      startDate: '2026-09-10',
+      endDate: '2026-09-11',
       slotCount: 0,
     };
     await expect(service.create(dto as any)).rejects.toThrow('库存不足');

@@ -3,8 +3,10 @@ import { MemberActivityService } from './member-activity.service';
 describe('MemberActivityService', () => {
   const activityRepo: any = { findOneBy: jest.fn(), create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e), findAndCount: jest.fn(), find: jest.fn() };
   const regRepo: any = { findOneBy: jest.fn(), create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e), find: jest.fn() };
+  const visibleTagRepo: any = { find: jest.fn(), findBy: jest.fn() };
+  const visibleMemberRepo: any = { find: jest.fn(), findBy: jest.fn() };
   const couponService: any = { issue: jest.fn(async () => ({})) };
-  const service = new MemberActivityService(activityRepo, regRepo, couponService);
+  const service = new MemberActivityService(activityRepo, regRepo, visibleTagRepo, visibleMemberRepo, couponService);
 
   it('register rejects ended activity', async () => {
     activityRepo.findOneBy.mockResolvedValue({ id: 1, status: 'ended' });

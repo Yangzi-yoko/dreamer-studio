@@ -3,8 +3,10 @@ import { MemberAuthService } from './member-auth.service';
 describe('MemberAuthService', () => {
   const memberRepo: any = { findOneBy: jest.fn(), create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
   const jwt: any = { sign: jest.fn(() => 'member-token') };
-  const redis: any = { get: jest.fn().mockResolvedValue(null), set: jest.fn(), incr: jest.fn(), expire: jest.fn() };
-  const service = new MemberAuthService(memberRepo, jwt, redis);
+  const redis: any = { get: jest.fn().mockResolvedValue(null), set: jest.fn(), incr: jest.fn().mockResolvedValue(1), expire: jest.fn(), ttl: jest.fn().mockResolvedValue(0), del: jest.fn() };
+  const referralService: any = { bind: jest.fn(async () => ({})) };
+  const throttle: any = { assertAllowed: jest.fn(async () => {}), onSuccess: jest.fn(), onFailure: jest.fn() };
+  const service = new MemberAuthService(memberRepo, jwt, redis, referralService, throttle);
 
   beforeEach(() => {
     memberRepo.findOneBy.mockReset();
@@ -25,7 +27,7 @@ describe('MemberAuthService', () => {
   });
 
   it('register rejects ip rate limit', async () => {
-    redis.get.mockResolvedValueOnce('5');
+    redis.incr.mockResolvedValueOnce(11);
     await expect(service.register({ phone: '13800000004', username: 'user4', password: 'pass123', nickname: '新用户' }, 'ip1', 'fp1')).rejects.toThrow('注册太频繁');
   });
 

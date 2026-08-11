@@ -15,6 +15,22 @@ describe('MemberReferralService', () => {
     expect(res.referrerMemberId).toBe(5);
   });
 
+  it('bind rejects when invitee already has downline', async () => {
+    memberRepo.findOneBy.mockResolvedValue({ id: 5, referralCode: 'MABC123' });
+    relRepo.findOneBy.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 1, referrerMemberId: 9, inviteeMemberId: 10 });
+    await expect(service.bind(9, 'MABC123')).rejects.toThrow('已有下线会员');
+  });
+
+  it('bind rejects when binding would form a cycle', async () => {
+    memberRepo.findOneBy.mockResolvedValue({ id: 43, referralCode: 'MCC43' });
+    relRepo.findOneBy
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({ id: 6, referrerMemberId: 42, inviteeMemberId: 43 })
+      .mockResolvedValueOnce({ id: 5, referrerMemberId: 41, inviteeMemberId: 42 });
+    await expect(service.bind(41, 'MCC43')).rejects.toThrow('绑定会形成环');
+  });
+
   it('settle pays percent reward to referrer', async () => {
     relRepo.findOneBy.mockResolvedValue({ id: 1, referrerMemberId: 5, inviteeMemberId: 9 });
     ruleRepo.findOneBy.mockResolvedValue({ id: 1, percent: 10, fixedCents: 0, enabled: true });
