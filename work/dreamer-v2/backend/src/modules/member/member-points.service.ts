@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { BusinessException } from '../../common/exceptions/business.exception';
+import { Member } from './entities/member.entity';
 import { MemberPoints } from './entities/member-points.entity';
 import { PointsLog } from './entities/points-log.entity';
 
@@ -16,6 +17,18 @@ export class MemberPointsService {
     return manager ?? this.pointsRepo.manager;
   }
 
+  private assertPoints(points: unknown): asserts points is number {
+    if (typeof points !== 'number' || !Number.isInteger(points) || points <= 0) {
+      throw new BusinessException('积分数量必须为正整数', 40041);
+    }
+  }
+
+  private async assertMemberExists(em: EntityManager, memberId: number): Promise<void> {
+    const memberRepo = em.getRepository(Member);
+    const member = await memberRepo.findOneBy({ id: memberId });
+    if (!member) throw new BusinessException('会员不存在', 40400);
+  }
+
   async getOrCreate(memberId: number, manager?: EntityManager): Promise<MemberPoints> {
     const em = this.em(manager);
     const pointsRepo = em.getRepository(MemberPoints);
@@ -26,6 +39,8 @@ export class MemberPointsService {
 
   async earn(memberId: number, points: number, remark?: string, manager?: EntityManager): Promise<MemberPoints> {
     const em = this.em(manager);
+    this.assertPoints(points);
+    await this.assertMemberExists(em, memberId);
     const pointsRepo = em.getRepository(MemberPoints);
     const logRepo = em.getRepository(PointsLog);
     const account = await this.getOrCreate(memberId, em);
@@ -39,6 +54,8 @@ export class MemberPointsService {
 
   async spend(memberId: number, points: number, remark?: string, manager?: EntityManager): Promise<MemberPoints> {
     const em = this.em(manager);
+    this.assertPoints(points);
+    await this.assertMemberExists(em, memberId);
     const pointsRepo = em.getRepository(MemberPoints);
     const logRepo = em.getRepository(PointsLog);
     const account = await this.getOrCreate(memberId, em);

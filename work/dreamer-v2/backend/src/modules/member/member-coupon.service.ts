@@ -7,6 +7,7 @@ import { computeCouponDeduct } from '../../common/utils/coupon.utils';
 import { Coupon } from './entities/coupon.entity';
 import { UserCoupon } from './entities/user-coupon.entity';
 import { CouponUsage } from './entities/coupon-usage.entity';
+import { Member } from './entities/member.entity';
 import { SaveCouponDto } from './dto/save-coupon.dto';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class MemberCouponService {
     @InjectRepository(Coupon) private readonly couponRepo: Repository<Coupon>,
     @InjectRepository(UserCoupon) private readonly userRepo: Repository<UserCoupon>,
     @InjectRepository(CouponUsage) private readonly usageRepo: Repository<CouponUsage>,
+    @InjectRepository(Member) private readonly memberRepo: Repository<Member>,
   ) {}
 
   async pageCoupons(page = 1, pageSize = 10): Promise<{ list: any[]; total: number; page: number; pageSize: number }> {
@@ -41,6 +43,8 @@ export class MemberCouponService {
   }
 
   async issue(memberId: number, couponId: number): Promise<Coupon> {
+    const member = await this.memberRepo.findOneBy({ id: memberId });
+    if (!member) throw new BusinessException('会员不存在', 40400);
     const coupon = await this.couponRepo.findOneBy({ id: couponId, enabled: true });
     if (!coupon) throw new BusinessException('优惠券不存在或已停用', 40400);
     if (coupon.issuedCount >= coupon.totalCount) throw new BusinessException('优惠券已发完', 40043);

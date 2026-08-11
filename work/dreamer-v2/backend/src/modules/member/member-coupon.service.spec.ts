@@ -4,7 +4,18 @@ describe('MemberCouponService', () => {
   const couponRepo: any = { findOneBy: jest.fn(), create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e), findAndCount: jest.fn() };
   const userRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e), findOneBy: jest.fn(), find: jest.fn() };
   const usageRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
-  const service = new MemberCouponService(couponRepo, userRepo, usageRepo);
+  const memberRepo: any = { findOneBy: jest.fn().mockResolvedValue({ id: 1 }) };
+  const service = new MemberCouponService(couponRepo, userRepo, usageRepo, memberRepo);
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    memberRepo.findOneBy.mockResolvedValue({ id: 1 });
+  });
+
+  it('issue rejects when member missing', async () => {
+    memberRepo.findOneBy.mockResolvedValue(null);
+    await expect(service.issue(1, 1)).rejects.toThrow('会员不存在');
+  });
 
   it('issue rejects when coupon sold out', async () => {
     couponRepo.findOneBy.mockResolvedValue({ id: 1, totalCount: 10, issuedCount: 10, enabled: true });
