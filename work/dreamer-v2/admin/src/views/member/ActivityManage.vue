@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { memberApi } from '../../api/member';
+import ImageUpload from '../../components/ImageUpload.vue';
 
 const list = ref<any[]>([]);
 const total = ref(0);
@@ -139,7 +140,7 @@ onMounted(async () => {
     <el-dialog v-model="dialogVisible" :title="editingId ? '编辑活动' : '新增活动'" width="640">
       <el-form :model="form" label-width="110px">
         <el-form-item label="标题"><el-input v-model="form.title" /></el-form-item>
-        <el-form-item label="图片URL"><el-input v-model="form.image" /></el-form-item>
+        <el-form-item label="活动图片"><ImageUpload v-model="form.image" :limit="1" /></el-form-item>
         <el-form-item label="说明"><el-input v-model="form.description" type="textarea" /></el-form-item>
         <el-form-item label="开始时间"><el-date-picker v-model="form.startAt" type="datetime" value-format="YYYY-MM-DDTHH:mm:ss" /></el-form-item>
         <el-form-item label="结束时间"><el-date-picker v-model="form.endAt" type="datetime" value-format="YYYY-MM-DDTHH:mm:ss" /></el-form-item>

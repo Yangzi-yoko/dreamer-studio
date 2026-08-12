@@ -3,6 +3,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { memberApi } from '../../api/member';
+import ImageUpload from '../../components/ImageUpload.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -77,7 +78,7 @@ async function submit() {
         <el-switch v-model="form.status" :active-value="1" :inactive-value="0" active-text="启用" inactive-text="禁用" />
       </el-form-item>
       <el-form-item label="昵称"><el-input v-model="form.nickname" /></el-form-item>
-      <el-form-item label="头像URL"><el-input v-model="form.avatar" /></el-form-item>
+      <el-form-item label="头像"><ImageUpload v-model="form.avatar" :limit="1" /></el-form-item>
       <el-form-item label="等级">
         <el-select v-model="form.levelId" clearable placeholder="选择等级">
           <el-option v-for="l in levels" :key="l.id" :label="l.name" :value="l.id" />

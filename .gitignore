@@ -5,6 +5,9 @@ node_modules/
 dist/
 build/
 
+# Uploaded media
+uploads/
+
 # Environment
 .env
 .env.*

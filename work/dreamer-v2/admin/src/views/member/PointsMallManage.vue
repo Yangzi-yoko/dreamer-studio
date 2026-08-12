@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { memberApi } from '../../api/member';
+import ImageUpload from '../../components/ImageUpload.vue';
 
 const list = ref<any[]>([]);
 const total = ref(0);
@@ -131,10 +132,7 @@ onMounted(load);
     <el-dialog v-model="dialogVisible" :title="editingId ? '编辑积分商品' : '新增积分商品'" width="560">
       <el-form :model="form" label-width="100px">
         <el-form-item label="名称"><el-input v-model="form.name" maxlength="64" /></el-form-item>
-        <el-form-item label="封面图片">
-          <el-input v-model="form.cover" placeholder="图片 URL" />
-          <el-image v-if="form.cover" :src="form.cover" fit="cover" style="width: 80px; height: 80px; margin-top: 6px; border-radius: 4px" />
-        </el-form-item>
+        <el-form-item label="封面图片"><ImageUpload v-model="form.cover" :limit="1" /></el-form-item>
         <el-form-item label="所需积分"><el-input-number v-model="form.point" :min="0" /></el-form-item>
         <el-form-item label="库存数量"><el-input-number v-model="form.stock" :min="0" /></el-form-item>
         <el-form-item label="每人限兑"><el-input-number v-model="form.limitPerUser" :min="0" /><span style="margin-left: 8px; color: #999">0 表示不限</span></el-form-item>

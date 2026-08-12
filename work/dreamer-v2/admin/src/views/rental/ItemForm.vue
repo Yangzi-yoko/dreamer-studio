@@ -3,6 +3,7 @@ import { onMounted, reactive } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { rentalApi } from '../../api/rental';
+import ImageUpload from '../../components/ImageUpload.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -40,7 +41,7 @@ async function submit() {
     <h3>{{ id && id !== 'new' ? '编辑商品' : '新增商品' }}</h3>
     <el-form :model="form" label-width="120px" style="max-width: 560px">
       <el-form-item label="名称"><el-input v-model="form.name" /></el-form-item>
-      <el-form-item label="图片URL"><el-input v-model="form.images" placeholder="逗号分隔多个URL" /></el-form-item>
+      <el-form-item label="商品图片"><ImageUpload v-model="form.images" multiple :limit="9" /></el-form-item>
       <el-form-item label="说明"><el-input v-model="form.description" type="textarea" /></el-form-item>
       <el-form-item label="计费方式">
         <el-radio-group v-model="form.billingType">
