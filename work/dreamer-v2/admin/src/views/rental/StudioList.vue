@@ -17,7 +17,18 @@ async function load() {
 }
 
 async function toggleEnabled(row: any) {
-  await rentalApi.updateStudio(row.id, { ...row, enabled: !row.enabled });
+  await rentalApi.updateStudio(row.id, {
+    name: row.name,
+    address: row.address,
+    images: row.images,
+    description: row.description,
+    weekdayPriceYuan: row.weekdayPrice,
+    weekendPriceYuan: row.weekendPrice,
+    holidayPriceYuan: row.holidayPrice,
+    depositYuan: row.deposit,
+    enabled: !row.enabled,
+    sort: row.sort,
+  });
   ElMessage.success('已更新');
   load();
 }

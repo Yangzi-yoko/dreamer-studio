@@ -17,7 +17,17 @@ async function load() {
 }
 
 async function toggleEnabled(row: any) {
-  await rentalApi.updateItem(row.id, { ...row, enabled: !row.enabled });
+  await rentalApi.updateItem(row.id, {
+    name: row.name,
+    images: row.images,
+    description: row.description,
+    billingType: row.billingType,
+    unitPriceYuan: row.unitPrice,
+    depositYuan: row.deposit,
+    stock: row.stock,
+    enabled: !row.enabled,
+    sort: row.sort,
+  });
   ElMessage.success('已更新');
   load();
 }
