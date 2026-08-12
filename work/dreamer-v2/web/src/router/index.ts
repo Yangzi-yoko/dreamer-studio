@@ -29,7 +29,7 @@ const router = createRouter({
       { path: 'member/points-mall/:id', name: 'PointsMallDetail', component: () => import('../views/member/PointsMallDetail.vue') },
     { path: 'member/points-orders', name: 'PointsMallOrders', component: () => import('../views/member/PointsOrders.vue') },
     ]},
-    { path: ':pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { public: true } },
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { public: true } },
   ],
 });
 
