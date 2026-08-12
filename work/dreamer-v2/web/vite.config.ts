@@ -26,6 +26,9 @@ function pxToRem(): any {
 
 export default defineConfig({
   plugins: [vue()],
+  build: {
+    sourcemap: false,
+  },
   css: {
     postcss: {
       plugins: [pxToRem()],

@@ -3,6 +3,9 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   base: '/admin/',
+  build: {
+    sourcemap: false,
+  },
   server: {
     proxy: {
       '/api': { target: 'http://127.0.0.1:3100', changeOrigin: true },

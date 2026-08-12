@@ -8,8 +8,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
-    const request = ctx.getRequest();
-    const path = request.url;
 
     let code = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = '服务器内部错误';
@@ -37,6 +35,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
       : exception instanceof BusinessException
         ? HttpStatus.BAD_REQUEST
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    response.status(status).json({ code, message, timestamp: new Date().toISOString(), path });
+
+    // 5xx 统一脱敏，避免把内部错误细节暴露给前端
+    if (status >= 500 && !(exception instanceof BusinessException)) {
+      message = '服务器内部错误';
+    }
+
+    response.status(status).json({ code, message });
   }
 }

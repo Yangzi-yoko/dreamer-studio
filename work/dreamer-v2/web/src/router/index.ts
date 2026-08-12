@@ -27,8 +27,9 @@ const router = createRouter({
       { path: 'member/packages', name: 'Packages', component: () => import('../views/member/Packages.vue') },
       { path: 'member/points-mall', name: 'PointsMall', component: () => import('../views/member/PointsMall.vue') },
       { path: 'member/points-mall/:id', name: 'PointsMallDetail', component: () => import('../views/member/PointsMallDetail.vue') },
-      { path: 'member/points-orders', name: 'PointsMallOrders', component: () => import('../views/member/PointsOrders.vue') },
+    { path: 'member/points-orders', name: 'PointsMallOrders', component: () => import('../views/member/PointsOrders.vue') },
     ]},
+    { path: ':pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { public: true } },
   ],
 });
 

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /member/
+Disallow: /orders/
+
+# 站点地图将在启用域名后补充
+# Sitemap: https://YOUR_DOMAIN/sitemap.xml

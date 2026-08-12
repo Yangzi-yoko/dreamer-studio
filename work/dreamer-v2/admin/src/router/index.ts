@@ -33,6 +33,7 @@ const routes: RouteRecordRaw[] = [
     { path: 'member/points-coupons', name: 'PointsCouponManage', component: () => import('../views/member/PointsCouponManage.vue') },
     { path: 'member/:id', name: 'MemberDetail', component: () => import('../views/member/MemberDetail.vue') },
   ]},
+  { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { public: true } },
 ];
 
 const router = createRouter({ history: createWebHistory(import.meta.env.BASE_URL), routes });
