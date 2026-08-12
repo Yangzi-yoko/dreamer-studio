@@ -39,6 +39,13 @@ a {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* 桌面端收窄为手机宽度，避免移动端内容被拉大 */
+@media screen and (min-width: 641PX) {
+  :root {
+    --app-max-width: 480PX;
+  }
+}
+
 /* 卡片通用样式 */
 .card {
   padding: 12px 16px;
