@@ -19,4 +19,8 @@ export class PreviewBookingDto {
   @IsOptional()
   @IsInt()
   userCouponId?: number;
+
+  @IsOptional()
+  @IsInt()
+  userPackageId?: number;
 }

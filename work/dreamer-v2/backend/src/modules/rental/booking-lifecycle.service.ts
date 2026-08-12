@@ -79,7 +79,7 @@ export class BookingLifecycleService {
       if (usage) {
         const up = await this.userPackageRepo.findOneBy({ id: usage.userPackageId, memberId: booking.memberId });
         if (up) {
-          up.remainingTimes += 1;
+          up.remainingMinutes += usage.minutes;
           up.status = 'active';
           await this.userPackageRepo.save(up);
         }

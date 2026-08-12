@@ -1,4 +1,5 @@
 import { BookingService } from './booking.service';
+import { UserPackage } from '../member/entities/user-package.entity';
 
 describe('BookingService', () => {
   const studioRepo: any = { findOneBy: jest.fn() };
@@ -6,6 +7,7 @@ describe('BookingService', () => {
     create: jest.fn((d: any) => d),
     save: jest.fn(async (e: any) => ({ ...e, id: 1 })),
     findAndCount: jest.fn(),
+    countBy: jest.fn().mockResolvedValue(0),
   };
   const slotRepo: any = { find: jest.fn(), findBy: jest.fn() };
   const btsRepo: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
@@ -124,5 +126,66 @@ describe('BookingService', () => {
     expect(res.totalAmount).toBe(100);
     expect(res.deduct).toBe(10);
     expect(res.payable).toBe(90);
+  });
+
+  it('preview returns duration hours and package remaining hours', async () => {
+    studioRepo.findOneBy.mockResolvedValue({
+      id: 1,
+      weekdayPriceCents: 10000,
+      weekendPriceCents: 15000,
+      holidayPriceCents: 20000,
+      depositCents: 5000,
+    });
+    slotRepo.findBy.mockResolvedValue([
+      { id: 1, startTime: '09:00', endTime: '10:00' },
+      { id: 2, startTime: '10:00', endTime: '11:30' },
+    ]);
+    userPackageRepo.findOneBy.mockResolvedValue({ id: 9, memberId: 5, status: 'active', remainingMinutes: 120 });
+    const res = await service.preview({ studioId: 1, bookingDate: '2026-08-19', timeSlotIds: [1, 2], memberId: 5, userPackageId: 9 }, { memberId: 5 });
+    expect(res.durationHours).toBe(2.5);
+    expect(res.packageRemainingHours).toBe(2);
+  });
+
+  it('package payment deducts slot duration minutes and rejects when insufficient', async () => {
+    studioRepo.findOneBy.mockResolvedValue({
+      id: 1,
+      weekdayPriceCents: 10000,
+      weekendPriceCents: 15000,
+      holidayPriceCents: 20000,
+      depositCents: 5000,
+    });
+    slotRepo.findBy.mockResolvedValue([
+      { id: 1, startTime: '09:00', endTime: '10:00' },
+      { id: 2, startTime: '10:00', endTime: '11:00' },
+    ]);
+    const up = { id: 9, memberId: 5, status: 'active', remainingMinutes: 180 };
+    const upRepoMock: any = { findOneBy: jest.fn().mockResolvedValue(up), save: jest.fn(async (e: any) => e) };
+    const usageRepoMock: any = { create: jest.fn((d: any) => d), save: jest.fn(async (e: any) => e) };
+    const manager: any = {
+      find: jest.fn().mockResolvedValue([]),
+      findBy: jest.fn().mockResolvedValue([]),
+      create: jest.fn((_e: any, d: any) => d),
+      save: jest.fn(async (e: any) => e),
+      getRepository: jest.fn((entity: any) => (entity === UserPackage ? upRepoMock : usageRepoMock)),
+    };
+    const dsPackage: any = { transaction: jest.fn(async (fn: any) => fn(manager)) };
+    const service4 = new BookingService(studioRepo, bookingRepo, slotRepo, btsRepo, walletRepo, walletLogRepo, userPackageRepo, packageUsageRepo, couponRepo, userCouponRepo, couponUsageRepo, dsPackage, redis);
+    const dto = {
+      studioId: 1,
+      customerName: '张三',
+      customerPhone: '13800000000',
+      bookingDate: '2026-10-01',
+      timeSlotIds: [1, 2],
+      memberId: 5,
+      payMethod: 'package',
+      userPackageId: 9,
+    };
+    const res = await service4.create(dto as any, { memberId: 5 });
+    expect(res.status).toBe('paid');
+    expect(up.remainingMinutes).toBe(60);
+    expect(usageRepoMock.save).toHaveBeenCalledWith(expect.objectContaining({ minutes: 120 }));
+
+    up.remainingMinutes = 30;
+    await expect(service4.create(dto as any, { memberId: 5 })).rejects.toThrow('计时卡时长不足');
   });
 });

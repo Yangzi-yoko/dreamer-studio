@@ -25,6 +25,15 @@ import { CouponUsage } from '../member/entities/coupon-usage.entity';
 const MAX_PENDING_BOOKINGS_PER_MEMBER = 3;
 const PENDING_EXPIRE_HOURS = 24;
 
+function toMinutes(time: string): number {
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function hoursText(minutes: number): number {
+  return Math.round((minutes / 60) * 100) / 100;
+}
+
 @Injectable()
 export class BookingService {
   constructor(
@@ -66,7 +75,7 @@ export class BookingService {
     return { uc, deductCents: computeCouponDeduct(coupon, amountCents), couponName: coupon.name };
   }
 
-  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number }, member?: MemberIdentity): Promise<any> {
+  async preview(dto: { studioId: number; bookingDate: string; timeSlotIds: number[]; memberId?: number; userCouponId?: number; userPackageId?: number }, member?: MemberIdentity): Promise<any> {
     const memberId = resolveMemberId(dto, member);
     const previewDate = parseDate(dto.bookingDate);
     const today = new Date();
@@ -83,14 +92,22 @@ export class BookingService {
     const unitPriceCents = this.priceOf(studio, parseDate(dto.bookingDate));
     const slotCount = slots.length;
     const totalAmount = unitPriceCents * slotCount;
+    const durationMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
     const result: any = {
       studioId: dto.studioId,
       bookingDate: dto.bookingDate,
       slotCount,
+      durationHours: hoursText(durationMinutes),
       unitPrice: toYuan(unitPriceCents),
       totalAmount: toYuan(totalAmount),
       deposit: toYuan(studio.depositCents),
     };
+    if (memberId && dto.userPackageId) {
+      const up = await this.userPackageRepo.findOneBy({ id: dto.userPackageId, memberId });
+      if (up && up.status === 'active') {
+        result.packageRemainingHours = hoursText(up.remainingMinutes);
+      }
+    }
     if (memberId && dto.userCouponId) {
       const { deductCents, couponName } = await this.resolveCoupon(memberId, dto.userCouponId, totalAmount, {
         userCoupon: this.userCouponRepo,
@@ -158,7 +175,7 @@ export class BookingService {
           throw new BusinessException('请先登录会员后再选择线上支付', 40100);
         }
         if (payMethod === 'package' && !dto.userPackageId) {
-          throw new BusinessException('请选择要使用的次卡', 40043);
+          throw new BusinessException('请选择要使用的计时卡', 40043);
         }
         if (dto.userCouponId && payMethod !== 'wallet') {
           throw new BusinessException('优惠券仅支持储值余额支付', 40047);
@@ -224,14 +241,18 @@ export class BookingService {
           const upRepo = manager.getRepository(UserPackage);
           const usageRepo = manager.getRepository(PackageUsage);
           const up = await upRepo.findOneBy({ id: dto.userPackageId, memberId: dto.memberId });
-          if (!up) throw new BusinessException('次卡不存在', 40400);
-          if (up.status !== 'active' || up.remainingTimes <= 0) throw new BusinessException('次卡次数不足', 40042);
-          up.remainingTimes -= 1;
+          if (!up) throw new BusinessException('计时卡不存在', 40400);
+          if (up.status !== 'active') throw new BusinessException('计时卡已失效', 40042);
+          const costMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
+          if (up.remainingMinutes < costMinutes) {
+            throw new BusinessException(`计时卡时长不足，本次需 ${hoursText(costMinutes)} 小时`, 40042);
+          }
+          up.remainingMinutes -= costMinutes;
           await upRepo.save(up);
           await usageRepo.save(usageRepo.create({
             userPackageId: up.id,
             memberId: dto.memberId,
-            times: 1,
+            minutes: costMinutes,
             remark: `场地预订 ${bookingNo}`,
           }));
         }

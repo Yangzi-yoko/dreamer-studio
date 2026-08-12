@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class SavePackageCardDto {
   @IsString()
@@ -7,7 +7,8 @@ export class SavePackageCardDto {
   name!: string;
 
   @IsInt()
-  totalTimes!: number;
+  @Min(1)
+  totalMinutes!: number;
 
   @IsInt()
   priceYuan!: number;

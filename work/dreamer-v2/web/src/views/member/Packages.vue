@@ -45,25 +45,25 @@ onMounted(load);
 <template>
   <div style="padding: 16px">
     <div style="display: flex; justify-content: space-between; align-items: center">
-      <h2 style="margin: 0">次卡商城</h2>
+      <h2 style="margin: 0">计时卡商城</h2>
       <span style="color: #e6a23c">余额 ¥{{ balance }}</span>
     </div>
 
     <div v-for="c in cards" :key="c.id" class="card">
       <div style="font-weight: 600">{{ c.name }}</div>
-      <div style="color: #999; margin: 6px 0">{{ c.totalTimes }} 次 · 有效期至购买时配置</div>
+      <div style="color: #999; margin: 6px 0">{{ c.totalHours }} 小时 · 有效期至购买时配置</div>
       <div style="display: flex; justify-content: space-between; align-items: center">
         <span style="color: #f56c6c; font-size: 18px">¥{{ c.price }}</span>
         <el-button type="primary" size="small" :loading="buyingId === c.id" @click="buy(c)">购买</el-button>
       </div>
     </div>
-    <el-empty v-if="!cards.length" description="暂无可购次卡" />
+    <el-empty v-if="!cards.length" description="暂无可购计时卡" />
 
-    <h3>我的次卡</h3>
+    <h3>我的计时卡</h3>
     <div v-for="p in myPackages" :key="p.id" class="card">
-      次卡 #{{ p.packageId }} · 剩余 {{ p.remainingTimes }} 次 · {{ p.status === 'active' ? '生效中' : p.status }}
+      计时卡 #{{ p.packageId }} · 剩余 {{ p.remainingHours }} 小时 · {{ p.status === 'active' ? '生效中' : p.status }}
     </div>
-    <el-empty v-if="!myPackages.length" description="暂无次卡" />
+    <el-empty v-if="!myPackages.length" description="暂无计时卡" />
   </div>
 </template>
 

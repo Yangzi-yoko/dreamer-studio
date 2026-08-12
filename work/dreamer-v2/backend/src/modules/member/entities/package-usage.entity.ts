@@ -13,7 +13,7 @@ export class PackageUsage {
   memberId!: number;
 
   @Column({ type: 'int', default: 1 })
-  times!: number;
+  minutes!: number;
 
   @Column({ length: 128, nullable: true })
   remark?: string;

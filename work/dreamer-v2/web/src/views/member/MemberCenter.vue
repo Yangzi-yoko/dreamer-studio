@@ -42,14 +42,14 @@ onMounted(async () => {
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/signin')">每日签到</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/points')">积分 {{ points }}</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/wallet')">储值 ¥{{ wallet }}</el-button>
-      <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/packages')">次卡商城</el-button>
+      <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/packages')">计时卡商城</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" type="primary" plain @click="router.push('/member/points-mall')">积分商城</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/points-orders')">我的兑换</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" type="primary" plain @click="router.push('/member/referral')">邀请有礼</el-button>
     </div>
-    <h3>我的次卡</h3>
+    <h3>我的计时卡</h3>
     <div v-for="p in packages" :key="p.id" class="card">
-      {{ packageNames[p.packageId] || `次卡 #${p.packageId}` }} · 剩余 {{ p.remainingTimes }} 次 · {{ p.status === 'active' ? '生效中' : p.status }}
+      {{ packageNames[p.packageId] || `计时卡 #${p.packageId}` }} · 剩余 {{ p.remainingHours }} 小时 · {{ p.status === 'active' ? '生效中' : p.status }}
     </div>
     <h3>我的优惠券</h3>
     <div v-for="c in coupons" :key="c.id" class="card">券 #{{ c.couponId }} · {{ c.status }}</div>

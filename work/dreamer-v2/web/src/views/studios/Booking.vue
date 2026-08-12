@@ -29,7 +29,7 @@ const form = reactive({
 });
 
 const enabledSlots = computed(() => slots.value.filter((s: any) => s.enabled));
-const availablePackages = computed(() => myPackages.value.filter((p: any) => p.status === 'active' && p.remainingTimes > 0));
+const availablePackages = computed(() => myPackages.value.filter((p: any) => p.status === 'active' && p.remainingMinutes > 0));
 const usableCoupons = computed(() => {
   const total = preview.value?.totalAmount ?? 0;
   return coupons.value.filter((c: any) => c.minSpend <= total);
@@ -100,7 +100,7 @@ async function submit() {
     return;
   }
   if (form.payMethod === 'package' && !form.userPackageId) {
-    ElMessage.warning('请选择要使用的次卡');
+    ElMessage.warning('请选择要使用的计时卡');
     return;
   }
   if (form.userCouponId && form.payMethod !== 'wallet') {
@@ -120,7 +120,7 @@ async function submit() {
     if (form.payMethod === 'package') payload.userPackageId = form.userPackageId;
     if (form.payMethod === 'wallet' && form.userCouponId) payload.userCouponId = form.userCouponId;
     await api.createBooking(payload);
-    ElMessage.success(form.payMethod === 'offline' ? '下单成功，待支付' : '预订成功，已扣费');
+    ElMessage.success(form.payMethod === 'offline' ? '下单成功，待支付' : form.payMethod === 'package' ? '预订成功，已扣时长' : '预订成功，已扣费');
     router.push('/orders');
   } catch (e: any) {
     ElMessage.error(e.message || '下单失败');
@@ -153,7 +153,7 @@ async function submit() {
       </el-form-item>
       <el-form-item v-if="preview" label="本次扣费">
         <span style="color: #f56c6c; font-size: 18px">¥{{ preview.totalAmount }}</span>
-        <span style="color: #999; margin-left: 8px">（{{ preview.slotCount }} 个时段 × ¥{{ preview.unitPrice }}）</span>
+        <span style="color: #999; margin-left: 8px">（{{ preview.slotCount }} 个时段 × ¥{{ preview.unitPrice }} · 共 {{ preview.durationHours }} 小时）</span>
       </el-form-item>
       <el-form-item v-if="preview && preview.deduct > 0" label="优惠">
         <span style="color: #67c23a">-¥{{ preview.deduct }}（{{ preview.couponName }}）</span>
@@ -165,7 +165,7 @@ async function submit() {
       <el-form-item v-if="loggedIn" label="支付方式">
         <el-radio-group v-model="form.payMethod">
           <el-radio value="wallet">储值余额</el-radio>
-          <el-radio value="package" :disabled="!availablePackages.length">次卡</el-radio>
+          <el-radio value="package" :disabled="!availablePackages.length">计时卡</el-radio>
           <el-radio value="offline">线下支付</el-radio>
         </el-radio-group>
       </el-form-item>
@@ -181,15 +181,16 @@ async function submit() {
         <div v-if="usableCoupons.length" style="color: #999; font-size: 12px">满 ¥{{ preview?.totalAmount ?? 0 }} 可用</div>
         <div v-else style="color: #999; font-size: 12px">暂无可用优惠券</div>
       </el-form-item>
-      <el-form-item v-if="loggedIn && form.payMethod === 'package'" label="选择次卡">
-        <el-select v-model="form.userPackageId" placeholder="选择次卡" style="width: 100%">
+      <el-form-item v-if="loggedIn && form.payMethod === 'package'" label="选择计时卡">
+        <el-select v-model="form.userPackageId" placeholder="选择计时卡" style="width: 100%">
           <el-option
             v-for="p in availablePackages"
             :key="p.id"
             :value="p.id"
-            :label="`次卡 #${p.packageId} · 剩余 ${p.remainingTimes} 次`"
+            :label="`计时卡 #${p.packageId} · 剩余 ${p.remainingHours} 小时`"
           />
         </el-select>
+        <div v-if="preview" style="color: #999; font-size: 12px">本次需扣 {{ preview.durationHours }} 小时，请选择剩余时长足够的计时卡</div>
       </el-form-item>
 
       <el-button type="primary" style="width: 100%" :loading="submitting" @click="submit">提交订单</el-button>

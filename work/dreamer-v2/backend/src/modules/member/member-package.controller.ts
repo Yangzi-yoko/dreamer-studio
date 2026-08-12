@@ -50,8 +50,8 @@ export class MemberPackageController {
 
   @Post('users/:userPackageId/use')
   @Permissions('member:package:list')
-  use(@Param('userPackageId', ParseIntPipe) userPackageId: number, @Body() dto: { memberId: number; remark?: string }) {
+  use(@Param('userPackageId', ParseIntPipe) userPackageId: number, @Body() dto: { memberId: number; minutes?: number; remark?: string }) {
     if (!dto?.memberId) throw new BusinessException('缺少会员ID', 40030);
-    return this.packageService.use(dto.memberId, userPackageId, dto.remark);
+    return this.packageService.useMinutes(dto.memberId, userPackageId, dto.minutes || 60, dto.remark);
   }
 }

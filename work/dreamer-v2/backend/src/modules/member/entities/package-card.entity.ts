@@ -8,8 +8,8 @@ export class PackageCard {
   @Column({ length: 64 })
   name!: string;
 
-  @Column({ name: 'total_times', type: 'int', default: 0 })
-  totalTimes!: number;
+  @Column({ name: 'total_minutes', type: 'int', default: 0 })
+  totalMinutes!: number;
 
   @Column({ name: 'price_cents', type: 'int', default: 0 })
   priceCents!: number;

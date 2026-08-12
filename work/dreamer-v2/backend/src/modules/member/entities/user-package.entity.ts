@@ -12,8 +12,8 @@ export class UserPackage {
   @Column({ name: 'package_id', type: 'int' })
   packageId!: number;
 
-  @Column({ name: 'remaining_times', type: 'int', default: 0 })
-  remainingTimes!: number;
+  @Column({ name: 'remaining_minutes', type: 'int', default: 0 })
+  remainingMinutes!: number;
 
   @Column({ length: 10, default: 'active' })
   status!: string;

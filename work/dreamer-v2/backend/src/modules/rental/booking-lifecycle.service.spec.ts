@@ -39,12 +39,12 @@ describe('BookingLifecycleService', () => {
     expect(walletLogRepo.save).toHaveBeenCalledWith(expect.objectContaining({ type: 'refund', amountCents: 19000 }));
   });
 
-  it('refund restores package time for package-paid booking', async () => {
+  it('refund restores package minutes for package-paid booking', async () => {
     repo.findOneBy.mockResolvedValue({ id: 2, bookingNo: 'B2', status: 'paid', memberId: 5, payMethod: 'package' });
-    packageUsageRepo.findOne.mockResolvedValue({ userPackageId: 9, memberId: 5, remark: '场地预订 B2' });
-    userPackageRepo.findOneBy.mockResolvedValue({ id: 9, memberId: 5, remainingTimes: 2, status: 'active' });
+    packageUsageRepo.findOne.mockResolvedValue({ userPackageId: 9, memberId: 5, remark: '场地预订 B2', minutes: 120 });
+    userPackageRepo.findOneBy.mockResolvedValue({ id: 9, memberId: 5, remainingMinutes: 6000, status: 'active' });
     const res = await service.refund(2);
     expect(res.status).toBe('refunded');
-    expect(userPackageRepo.save).toHaveBeenCalledWith(expect.objectContaining({ remainingTimes: 3 }));
+    expect(userPackageRepo.save).toHaveBeenCalledWith(expect.objectContaining({ remainingMinutes: 6120 }));
   });
 });
