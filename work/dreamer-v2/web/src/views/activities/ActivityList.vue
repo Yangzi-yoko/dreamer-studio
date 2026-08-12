@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { api } from '../../api';
+import AppImage from '../../components/AppImage.vue';
 
 const router = useRouter();
 const list = ref<any[]>([]);
@@ -19,8 +20,11 @@ onMounted(async () => {
   <div style="padding: 16px">
     <h2>活动</h2>
     <div v-for="a in list" :key="a.id" class="card" @click="router.push(`/activity/${a.id}`)">
-      <div style="font-weight: 600">{{ a.title }}</div>
-      <div style="color: #909399">{{ a.startAt }} ~ {{ a.endAt }}</div>
+      <AppImage :src="a.image" :ratio="'16 / 8'" radius="8px" alt="活动图片" />
+      <div class="card__body">
+        <div class="card__title">{{ a.title }}</div>
+        <div class="card__time">{{ (a.startAt || '').slice(0, 10) }} ~ {{ (a.endAt || '').slice(0, 10) }}</div>
+      </div>
     </div>
     <el-empty v-if="!list.length" description="暂无活动" />
   </div>
@@ -28,9 +32,26 @@ onMounted(async () => {
 
 <style scoped>
 .card {
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.card__body {
+  padding: 10px 12px;
+}
+
+.card__title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.card__time {
+  color: #909399;
+  font-size: 12px;
+  margin-top: 4px;
 }
 </style>

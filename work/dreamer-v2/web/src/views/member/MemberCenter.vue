@@ -6,6 +6,7 @@ import { api } from '../../api';
 
 const router = useRouter();
 const phone = sessionStorage.getItem('member_phone') || '';
+const avatar = ref('');
 const points = ref(0);
 const wallet = ref(0);
 const packages = ref<any[]>([]);
@@ -13,6 +14,10 @@ const coupons = ref<any[]>([]);
 const packageNames = ref<Record<number, string>>({});
 
 onMounted(async () => {
+  try {
+    const me: any = await api.me();
+    avatar.value = me?.avatar || '';
+  } catch {}
   try {
     const p: any = await api.memberPoints();
     points.value = p.account?.balance ?? 0;
@@ -37,7 +42,12 @@ onMounted(async () => {
 <template>
   <div style="padding: 16px">
     <h2>会员中心</h2>
-    <div>手机号：{{ phone }}</div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px">
+      <img v-if="avatar" :src="avatar" class="avatar" alt="头像" />
+      <div>
+        <div>手机号：{{ phone }}</div>
+      </div>
+    </div>
     <div style="display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap">
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/signin')">每日签到</el-button>
       <el-button style="flex: 1; min-width: calc(33% - 6px)" @click="router.push('/member/points')">积分 {{ points }}</el-button>
@@ -62,5 +72,13 @@ onMounted(async () => {
   border: 1px solid #eee;
   border-radius: 8px;
   margin-bottom: 6px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #eee;
 }
 </style>
