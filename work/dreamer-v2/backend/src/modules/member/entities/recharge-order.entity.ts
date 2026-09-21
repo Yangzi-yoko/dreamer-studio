@@ -15,8 +15,14 @@ export class RechargeOrder {
   @Column({ name: 'amount_cents', type: 'int' })
   amountCents!: number;
 
+  @Column({ name: 'bonus_cents', type: 'int', default: 0 })
+  bonusCents!: number;
+
   @Column({ length: 10, default: 'pending' })
   status!: 'pending' | 'paid' | 'cancelled';
+
+  @Column({ length: 20, nullable: true })
+  payMethod?: string;
 
   @Column({ length: 128, nullable: true })
   remark?: string;

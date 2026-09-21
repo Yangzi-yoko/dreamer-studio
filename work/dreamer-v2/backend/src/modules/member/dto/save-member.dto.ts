@@ -6,7 +6,7 @@ export class SaveMemberDto {
 
   @IsOptional()
   @IsString()
-  @Matches(/^[a-zA-Z0-9_]{4,32}$/)
+  @MaxLength(64)
   username?: string;
 
   @IsOptional()

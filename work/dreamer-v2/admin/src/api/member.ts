@@ -73,7 +73,19 @@ export const memberApi = {
 
   pointCouponPage: (page: number, pageSize: number) => request.get<any, any>('/member/point-coupons/admin', { params: { page, pageSize } }),
   pointCouponLogs: (page: number, pageSize: number) => request.get<any, any>('/member/point-coupons/logs', { params: { page, pageSize } }),
+
+  memberSearch: (keyword: string) => request.get<any, any>('/member/members/search', { params: { keyword } }),
   createPointsCoupon: (data: any) => request.post<any, any>('/member/point-coupons', data),
   updatePointsCoupon: (id: number, data: any) => request.put<any, any>(`/member/point-coupons/${id}`, data),
   deletePointsCoupon: (id: number) => request.delete<any, any>(`/member/point-coupons/${id}`),
+
+  financeOverview: (params?: any) => request.get<any, any>('/finance/overview', { params }),
+  financeRevenueTrend: (days = 30) => request.get<any, any>('/finance/revenue-trend', { params: { days } }),
+  financeRevenueBySource: (params?: any) => request.get<any, any>('/finance/revenue-by-source', { params }),
+  financeTransactions: (params: any) => request.get<any, any>('/finance/transactions', { params }),
+
+  rechargeRulePage: (page: number, pageSize: number) => request.get<any, any>('/member/recharge-rules', { params: { page, pageSize } }),
+  rechargeRuleCreate: (data: any) => request.post<any, any>('/member/recharge-rules', data),
+  rechargeRuleUpdate: (id: number, data: any) => request.put<any, any>(`/member/recharge-rules/${id}`, data),
+  rechargeRuleDelete: (id: number) => request.delete<any, any>(`/member/recharge-rules/${id}`),
 };

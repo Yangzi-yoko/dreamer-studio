@@ -32,6 +32,8 @@ const routes: RouteRecordRaw[] = [
     { path: 'member/points-orders', name: 'PointsExchangeOrders', component: () => import('../views/member/PointsExchangeOrders.vue') },
     { path: 'member/points-coupons', name: 'PointsCouponManage', component: () => import('../views/member/PointsCouponManage.vue') },
     { path: 'member/:id', name: 'MemberDetail', component: () => import('../views/member/MemberDetail.vue') },
+    { path: 'member/recharge-rules', name: 'RechargeRuleManage', component: () => import('../views/member/RechargeRuleManage.vue') },
+        { path: 'finance', name: 'Finance', component: () => import('../views/Finance.vue') },
   ]},
   { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('../views/NotFound.vue'), meta: { public: true } },
 ];

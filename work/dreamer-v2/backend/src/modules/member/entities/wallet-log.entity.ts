@@ -15,6 +15,9 @@ export class WalletLog {
   @Column({ name: 'amount_cents', type: 'int' })
   amountCents!: number;
 
+  @Column({ name: 'bonus_cents', type: 'int', default: 0 })
+  bonusCents!: number;
+
   @Column({ name: 'balance_after_cents', type: 'int' })
   balanceAfterCents!: number;
 

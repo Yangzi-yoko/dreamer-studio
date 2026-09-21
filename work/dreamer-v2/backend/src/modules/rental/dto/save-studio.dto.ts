@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class SaveStudioDto {
   @IsString()
@@ -38,4 +38,9 @@ export class SaveStudioDto {
   @IsOptional()
   @IsInt()
   sort?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(30)
+  minBookingMinutes?: number;
 }

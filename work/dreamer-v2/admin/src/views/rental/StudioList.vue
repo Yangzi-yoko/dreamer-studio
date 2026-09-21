@@ -26,6 +26,7 @@ async function toggleEnabled(row: any) {
     weekendPriceYuan: row.weekendPrice,
     holidayPriceYuan: row.holidayPrice,
     depositYuan: row.deposit,
+    minBookingMinutes: row.minBookingMinutes,
     enabled: !row.enabled,
     sort: row.sort,
   });
@@ -64,6 +65,9 @@ onMounted(load);
       </el-table-column>
       <el-table-column label="押金" width="90">
         <template #default="{ row }">¥{{ row.deposit }}</template>
+      </el-table-column>
+      <el-table-column label="最低预约" width="100">
+        <template #default="{ row }">{{ row.minBookingMinutes || 30 }}分钟</template>
       </el-table-column>
       <el-table-column label="状态" width="90">
         <template #default="{ row }">{{ row.enabled ? '上架' : '下架' }}</template>

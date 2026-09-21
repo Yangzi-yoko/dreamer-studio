@@ -6,6 +6,7 @@ import { toYuan } from '../../common/utils/money.utils';
 import { RechargeOrder } from './entities/recharge-order.entity';
 import { MemberWallet } from './entities/member-wallet.entity';
 import { WalletLog } from './entities/wallet-log.entity';
+import { RechargeRule } from './entities/recharge-rule.entity';
 
 @Injectable()
 export class RechargeOrderService {
@@ -13,16 +14,23 @@ export class RechargeOrderService {
     @InjectRepository(RechargeOrder) private readonly orderRepo: Repository<RechargeOrder>,
     @InjectRepository(MemberWallet) private readonly walletRepo: Repository<MemberWallet>,
     @InjectRepository(WalletLog) private readonly logRepo: Repository<WalletLog>,
+    @InjectRepository(RechargeRule) private readonly ruleRepo: Repository<RechargeRule>,
   ) {}
 
   async create(memberId: number, amountCents: number, remark?: string): Promise<RechargeOrder> {
     if (!Number.isFinite(amountCents) || amountCents <= 0) throw new BusinessException('充值金额必须大于 0', 40040);
+    if (amountCents > 10000000) throw new BusinessException('单次充值不能超过10万元', 40042);
+
+    const rule = await this.ruleRepo.findOneBy({ amountCents, enabled: true });
+    const bonusCents = rule?.bonusCents ?? 0;
+
     const orderNo = `R${new Date().toISOString().slice(0, 10).replace(/-/g, '')}${Date.now().toString(36).toUpperCase()}${Math.floor(Math.random() * 1000)}`;
-    return this.orderRepo.save(this.orderRepo.create({ orderNo, memberId, amountCents, status: 'pending', remark }));
+    return this.orderRepo.save(this.orderRepo.create({ orderNo, memberId, amountCents, bonusCents, status: 'pending', remark }));
   }
 
-  async mine(memberId: number): Promise<RechargeOrder[]> {
-    return this.orderRepo.find({ where: { memberId }, order: { createdAt: 'DESC' } });
+  async mine(memberId: number): Promise<any[]> {
+    const orders = await this.orderRepo.find({ where: { memberId }, order: { createdAt: 'DESC' } });
+    return orders.map(o => ({ ...o, amount: toYuan(o.amountCents), bonus: toYuan(o.bonusCents) }));
   }
 
   async page(page = 1, pageSize = 10, status?: string): Promise<{ list: any[]; total: number; page: number; pageSize: number }> {
@@ -34,10 +42,8 @@ export class RechargeOrderService {
       order: { createdAt: 'DESC' },
     });
     return {
-      list: list.map((o) => ({ ...o, amount: toYuan(o.amountCents) })),
-      total,
-      page,
-      pageSize,
+      list: list.map((o) => ({ ...o, amount: toYuan(o.amountCents), bonus: toYuan(o.bonusCents) })),
+      total, page, pageSize,
     };
   }
 
@@ -51,16 +57,21 @@ export class RechargeOrderService {
 
     let wallet = await this.walletRepo.findOneBy({ memberId });
     if (!wallet) {
-      wallet = await this.walletRepo.save(this.walletRepo.create({ memberId, balanceCents: 0 }));
+      wallet = await this.walletRepo.save(this.walletRepo.create({ memberId, balanceCents: 0, principalCents: 0, bonusCents: 0 }));
     }
-    wallet.balanceCents += order.amountCents;
+    wallet.balanceCents += order.amountCents + order.bonusCents;
+    wallet.principalCents += order.amountCents;
+    wallet.bonusCents += order.bonusCents;
     const savedWallet = await this.walletRepo.save(wallet);
     await this.logRepo.save(this.logRepo.create({
       memberId,
       type: 'recharge',
       amountCents: order.amountCents,
+      bonusCents: order.bonusCents,
       balanceAfterCents: savedWallet.balanceCents,
-      remark: `充值订单 ${order.orderNo}`,
+      remark: order.bonusCents > 0
+        ? `充值订单${order.orderNo}（充${order.amountCents / 100}送${order.bonusCents / 100}）`
+        : `充值订单${order.orderNo}`,
     }));
     return saved;
   }

@@ -1,0 +1,24 @@
+services:
+  mysql:
+    image: docker.1ms.run/library/mysql:8.0
+    container_name: dreamer-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root123456
+      - MYSQL_DATABASE=dreamer_v2
+      - MYSQL_USER=dreamer_v2
+      - MYSQL_PASSWORD=dreamer_v2
+    volumes:
+      - /home/ubuntu/dreamer-studio/deploy/mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+
+  redis:
+    image: docker.1ms.run/library/redis:7-alpine
+    container_name: dreamer-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/ubuntu/dreamer-studio/deploy/redis-data:/data

@@ -58,6 +58,7 @@ export class StudioService extends BaseService<Studio> {
       weekendPrice: toYuan(s.weekendPriceCents),
       holidayPrice: toYuan(s.holidayPriceCents),
       deposit: toYuan(s.depositCents),
+      minBookingMinutes: s.minBookingMinutes || 30,
       enabled: s.enabled,
       sort: s.sort,
       createdAt: s.createdAt,

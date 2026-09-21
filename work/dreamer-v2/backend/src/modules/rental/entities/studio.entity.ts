@@ -29,6 +29,9 @@ export class Studio {
   @Column({ name: 'deposit_cents', type: 'int', default: 0 })
   depositCents!: number;
 
+  @Column({ name: 'min_booking_minutes', type: 'int', default: 30 })
+  minBookingMinutes!: number;
+
   @Column({ default: true })
   enabled!: boolean;
 

@@ -19,11 +19,19 @@ export class MemberWalletController {
   }
 
   @UseGuards(MemberAuthGuard)
+  @Get('me/rules')
+  async myRules() {
+    return this.walletService.getRechargeRules();
+  }
+
+  @UseGuards(MemberAuthGuard)
   @Post('me/recharge')
   async myRecharge(@CurrentMember() member: CurrentMemberPayload, @Body() dto: { amountYuan: number; remark?: string }) {
     const cents = Math.round(Number(dto.amountYuan) * 100);
     if (!Number.isFinite(cents) || cents <= 0) throw new BusinessException('充值金额必须大于 0', 40040);
-    return this.walletService.recharge(member.memberId, cents, dto.remark);
+    if (cents > 10000000) throw new BusinessException('单次充值不能超过10万元', 40042);
+    const bonusCents = await this.walletService.getBonusForAmount(cents);
+    return this.walletService.recharge(member.memberId, cents, bonusCents, dto.remark);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -33,17 +41,34 @@ export class MemberWalletController {
     const wallet = await this.walletService.getOrCreate(memberId);
     const logs = await this.walletService.page(memberId, Number(page), Number(pageSize));
     return {
-      account: { memberId, balance: toYuan(wallet.balanceCents) },
-      logs: logs.list.map((l) => ({ ...l, amount: toYuan(l.amountCents), balanceAfter: toYuan(l.balanceAfterCents) })),
+      account: {
+        memberId,
+        balance: toYuan(wallet.balanceCents),
+        principal: toYuan(wallet.principalCents),
+        bonus: toYuan(wallet.bonusCents),
+      },
+      logs: logs.list.map((l) => ({
+        ...l,
+        amount: toYuan(l.amountCents),
+        bonus: toYuan(l.bonusCents),
+        balanceAfter: toYuan(l.balanceAfterCents),
+      })),
       total: logs.total,
     };
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionsGuard)
+  @Permissions('member:wallet:list')
+  @Get('rules/all')
+  async rules() {
+    return this.walletService.getRechargeRules();
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)
   @Post(':memberId/recharge')
   recharge(@Param('memberId', ParseIntPipe) memberId: number, @Body() dto: { amountYuan: number; remark?: string }) {
     this.assertAmount(dto.amountYuan);
-    return this.walletService.recharge(memberId, Math.round(dto.amountYuan * 100), dto.remark);
+    return this.walletService.recharge(memberId, Math.round(dto.amountYuan * 100), 0, dto.remark);
   }
 
   @UseGuards(JwtAuthGuard, PermissionsGuard)

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { memberApi } from '../../api/member';
 
-const phone = ref('');
+const keyword = ref('');
 const member = ref<any>(null);
 const pointsAccount = ref<any>(null);
 const walletAccount = ref<any>(null);
@@ -17,15 +17,14 @@ const pointsOp = ref<'earn' | 'spend'>('earn');
 const walletOp = ref<'recharge' | 'deduct' | 'refund'>('recharge');
 
 async function search() {
-  if (!/^1\d{10}$/.test(phone.value)) {
-    ElMessage.warning('请输入正确的手机号');
+  if (!keyword.value || keyword.value.trim().length === 0) {
+    ElMessage.warning('输入手机号、用户名或会员ID');
     return;
   }
   loading.value = true;
   try {
-    const res: any = await memberApi.memberPage(1, 1000);
-    const m = res.list.find((x: any) => x.phone === phone.value);
-    if (!m) {
+    const list: any[] = await memberApi.memberSearch(keyword.value.trim());
+    if (!list || list.length === 0) {
       ElMessage.warning('未找到该会员');
       member.value = null;
       pointsAccount.value = null;
@@ -34,8 +33,8 @@ async function search() {
       walletLogs.value = [];
       return;
     }
-    member.value = m;
-    await loadAccounts(m.id);
+    member.value = list[0];
+    await loadAccounts(list[0].id);
   } finally {
     loading.value = false;
   }
@@ -88,16 +87,16 @@ async function submitWallet() {
   <el-card>
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px">
       <h3 style="margin: 0">积分 / 储值</h3>
-      <el-input v-model="phone" placeholder="输入会员手机号" style="width: 220px" clearable @keyup.enter="search" />
+      <el-input v-model="keyword" placeholder="输入手机号、用户名或会员ID" style="width: 280px" clearable @keyup.enter="search" />
       <el-button type="primary" :loading="loading" @click="search">查询</el-button>
     </div>
 
     <template v-if="member">
       <el-descriptions :column="4" border style="margin-bottom: 16px">
+        <el-descriptions-item label="会员ID">{{ member.id }}</el-descriptions-item>
         <el-descriptions-item label="手机号">{{ member.phone }}</el-descriptions-item>
         <el-descriptions-item label="昵称">{{ member.nickname || '-' }}</el-descriptions-item>
         <el-descriptions-item label="累计消费">¥{{ member.totalSpend }}</el-descriptions-item>
-        <el-descriptions-item label="订单数">{{ member.totalOrders }}</el-descriptions-item>
         <el-descriptions-item label="积分余额">{{ pointsAccount?.balance ?? 0 }}</el-descriptions-item>
         <el-descriptions-item label="储值余额">¥{{ walletAccount?.balance ?? 0 }}</el-descriptions-item>
       </el-descriptions>

@@ -12,6 +12,12 @@ export class MemberWallet {
   @Column({ name: 'balance_cents', type: 'int', default: 0 })
   balanceCents!: number;
 
+  @Column({ name: 'principal_cents', type: 'int', default: 0 })
+  principalCents!: number;
+
+  @Column({ name: 'bonus_cents', type: 'int', default: 0 })
+  bonusCents!: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

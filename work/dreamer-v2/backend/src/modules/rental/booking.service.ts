@@ -89,15 +89,31 @@ export class BookingService {
     if (slots.length !== dto.timeSlotIds.length) {
       throw new BusinessException('部分时段无效或已停用', 40021);
     }
+
+    // Validate minimum booking duration
+    const durationMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
+    if (studio.minBookingMinutes && durationMinutes < studio.minBookingMinutes) {
+      throw new BusinessException(`预订时长不足，最低需 ${studio.minBookingMinutes} 分钟（${studio.minBookingMinutes / 60} 小时）`, 40022);
+    }
+
+    // Validate slots are consecutive (0.5 hour interval)
+    const sortedSlots = [...slots].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+    for (let i = 1; i < sortedSlots.length; i++) {
+      const prevEnd = toMinutes(sortedSlots[i - 1].endTime);
+      const currStart = toMinutes(sortedSlots[i].startTime);
+      if (prevEnd !== currStart) {
+        throw new BusinessException('所选时段必须连续', 40023);
+      }
+    }
     const unitPriceCents = this.priceOf(studio, parseDate(dto.bookingDate));
     const slotCount = slots.length;
     const totalAmount = unitPriceCents * slotCount;
-    const durationMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
+    const totalDurationMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
     const result: any = {
       studioId: dto.studioId,
       bookingDate: dto.bookingDate,
       slotCount,
-      durationHours: hoursText(durationMinutes),
+      durationHours: hoursText(totalDurationMinutes),
       unitPrice: toYuan(unitPriceCents),
       totalAmount: toYuan(totalAmount),
       deposit: toYuan(studio.depositCents),
@@ -145,6 +161,22 @@ export class BookingService {
     const slots = await this.slotRepo.findBy({ id: In(dto.timeSlotIds), studioId: dto.studioId, enabled: true });
     if (slots.length !== dto.timeSlotIds.length) {
       throw new BusinessException('部分时段无效或已停用', 40021);
+    }
+
+    // Validate minimum booking duration
+    const durationMinutes = slots.reduce((sum, s) => sum + (toMinutes(s.endTime) - toMinutes(s.startTime)), 0);
+    if (studio.minBookingMinutes && durationMinutes < studio.minBookingMinutes) {
+      throw new BusinessException(`预订时长不足，最低需 ${studio.minBookingMinutes} 分钟（${studio.minBookingMinutes / 60} 小时）`, 40022);
+    }
+
+    // Validate slots are consecutive (0.5 hour interval)
+    const sortedSlots = [...slots].sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime));
+    for (let i = 1; i < sortedSlots.length; i++) {
+      const prevEnd = toMinutes(sortedSlots[i - 1].endTime);
+      const currStart = toMinutes(sortedSlots[i].startTime);
+      if (prevEnd !== currStart) {
+        throw new BusinessException('所选时段必须连续', 40023);
+      }
     }
 
     const lockKey = `rental:lock:${dto.studioId}:${dto.bookingDate}`;

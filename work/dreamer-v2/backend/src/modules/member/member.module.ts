@@ -61,10 +61,12 @@ import { PointsCoupon } from './entities/point-coupon.entity';
 import { PointsCouponLog } from './entities/point-coupon-log.entity';
 import { PointsCouponService } from './points-coupon.service';
 import { PointsCouponController } from './points-coupon.controller';
+import { RechargeRule } from './entities/recharge-rule.entity';
+import { RechargeRuleController } from './recharge-rule.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder, PointsProduct, PointsExchangeOrder, PointsCoupon, PointsCouponLog]), SystemModule],
-  controllers: [MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController, PointsProductController, PointsExchangeMemberController, PointsExchangeController, PointsCouponController],
+  imports: [TypeOrmModule.forFeature([RechargeRule, Member, MemberLevel, MemberTag, MemberPoints, PointsLog, MemberWallet, WalletLog, PackageCard, UserPackage, PackageUsage, Coupon, UserCoupon, CouponUsage, SigninLog, BirthdayGift, BirthdayGiftLog, ReferralRelation, ReferralRule, ReferralReward, Activity, ActivityRegistration, ActivityVisibleTag, ActivityVisibleMember, RechargeOrder, PointsProduct, PointsExchangeOrder, PointsCoupon, PointsCouponLog]), SystemModule],
+  controllers: [RechargeRuleController, MemberController, MemberLevelController, MemberTagController, MemberPointsController, MemberWalletController, MemberPackageController, MemberPackageMemberController, MemberCouponController, MemberSigninController, MemberBirthdayController, MemberReferralController, MemberActivityController, RechargeOrderController, PointsProductController, PointsExchangeMemberController, PointsExchangeController, PointsCouponController],
   providers: [MemberService, MemberLevelService, MemberTagService, MemberPointsService, MemberWalletService, MemberPackageService, MemberCouponService, MemberSigninService, MemberBirthdayService, MemberReferralService, MemberActivityService, RechargeOrderService, PointsProductService, PointsExchangeService, PointsCouponService],
   exports: [MemberService, MemberReferralService],
 })

@@ -22,13 +22,77 @@ const form = reactive({
   customerName: '',
   customerPhone: sessionStorage.getItem('member_phone') || '',
   bookingDate: '',
+  startTime: '' as string,
+  endTime: '' as string,
   timeSlotIds: [] as number[],
   payMethod: 'wallet' as 'wallet' | 'package' | 'offline',
   userPackageId: undefined as number | undefined,
   userCouponId: undefined as number | undefined,
 });
 
-const enabledSlots = computed(() => slots.value.filter((s: any) => s.enabled));
+// Generate time options (09:00 - 18:00, 30min interval)
+const timeOptions = computed(() => {
+  const options: string[] = [];
+  for (let h = 9; h <= 18; h++) {
+    options.push(`${String(h).padStart(2, '0')}:00`);
+    if (h < 18) options.push(`${String(h).padStart(2, '0')}:30`);
+  }
+  return options;
+});
+
+// Filter end time options (must be after start time)
+const endTimeOptions = computed(() => {
+  if (!form.startTime) return [];
+  const startIdx = timeOptions.value.indexOf(form.startTime);
+  return timeOptions.value.slice(startIdx + 1);
+});
+
+// Calculate duration in hours
+const durationHours = computed(() => {
+  if (!form.startTime || !form.endTime) return 0;
+  const [sh, sm] = form.startTime.split(':').map(Number);
+  const [eh, em] = form.endTime.split(':').map(Number);
+  const minutes = (eh * 60 + em) - (sh * 60 + sm);
+  return Math.round((minutes / 60) * 100) / 100;
+});
+
+// Calculate duration in minutes
+const durationMinutes = computed(() => {
+  if (!form.startTime || !form.endTime) return 0;
+  const [sh, sm] = form.startTime.split(':').map(Number);
+  const [eh, em] = form.endTime.split(':').map(Number);
+  return (eh * 60 + em) - (sh * 60 + sm);
+});
+
+// Auto-calculate time slots based on start/end time
+function calculateTimeSlots() {
+  if (!form.startTime || !form.endTime || !slots.value.length) {
+    form.timeSlotIds = [];
+    return;
+  }
+  const [sh, sm] = form.startTime.split(':').map(Number);
+  const [eh, em] = form.endTime.split(':').map(Number);
+  const startMinutes = sh * 60 + sm;
+  const endMinutes = eh * 60 + em;
+
+  // Find matching slots
+  const matchedSlots = slots.value.filter((s: any) => {
+    if (!s.enabled) return false;
+    const [slotSh, slotSm] = s.startTime.split(':').map(Number);
+    const [slotEh, slotEm] = s.endTime.split(':').map(Number);
+    const slotStart = slotSh * 60 + slotSm;
+    const slotEnd = slotEh * 60 + slotEm;
+    return slotStart >= startMinutes && slotEnd <= endMinutes;
+  });
+
+  form.timeSlotIds = matchedSlots.map((s: any) => s.id);
+}
+
+// Watch start/end time changes
+watch(() => [form.startTime, form.endTime], () => {
+  calculateTimeSlots();
+});
+
 const availablePackages = computed(() => myPackages.value.filter((p: any) => p.status === 'active' && p.remainingMinutes > 0));
 const usableCoupons = computed(() => {
   const total = preview.value?.totalAmount ?? 0;
@@ -38,6 +102,13 @@ const couponLabel = (c: any) => {
   if (c.type === 'amount') return `${c.couponName}（满¥${c.minSpend}减¥${c.value / 100}）`;
   return `${c.couponName}（${c.value / 10}折）`;
 };
+
+// Check minimum booking duration
+const minBookingMinutes = computed(() => studio.value?.minBookingMinutes || 30);
+const isDurationValid = computed(() => {
+  if (!form.startTime || !form.endTime) return true;
+  return durationMinutes.value >= minBookingMinutes.value;
+});
 
 onMounted(async () => {
   try {
@@ -95,8 +166,16 @@ async function submit() {
     ElMessage.warning('请填写正确的客户信息');
     return;
   }
-  if (!form.bookingDate || !form.timeSlotIds.length) {
-    ElMessage.warning('请选择日期和时段');
+  if (!form.bookingDate || !form.startTime || !form.endTime) {
+    ElMessage.warning('请选择日期和时间段');
+    return;
+  }
+  if (!isDurationValid.value) {
+    ElMessage.warning(`预订时长不足，最低需 ${minBookingMinutes.value} 分钟（${minBookingMinutes.value / 60} 小时）`);
+    return;
+  }
+  if (form.timeSlotIds.length === 0) {
+    ElMessage.warning('所选时间段内没有可用时段');
     return;
   }
   if (form.payMethod === 'package' && !form.userPackageId) {
@@ -139,13 +218,26 @@ async function submit() {
       <el-form-item label="日期">
         <el-date-picker v-model="form.bookingDate" type="date" value-format="YYYY-MM-DD" placeholder="选择日期" style="width: 100%" />
       </el-form-item>
-      <el-form-item label="时段">
-        <el-checkbox-group v-model="form.timeSlotIds">
-          <el-checkbox v-for="t in enabledSlots" :key="t.id" :value="t.id">
-            {{ t.startTime }}-{{ t.endTime }}
-          </el-checkbox>
-        </el-checkbox-group>
-        <div v-if="!enabledSlots.length" style="color: #999">该场地暂未配置时段</div>
+      <el-form-item label="开始时间">
+        <el-select v-model="form.startTime" placeholder="选择开始时间" style="width: 100%">
+          <el-option v-for="t in timeOptions" :key="t" :value="t" :label="t" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="结束时间">
+        <el-select v-model="form.endTime" placeholder="选择结束时间" :disabled="!form.startTime" style="width: 100%">
+          <el-option v-for="t in endTimeOptions" :key="t" :value="t" :label="t" />
+        </el-select>
+      </el-form-item>
+      <el-form-item v-if="form.startTime && form.endTime" label="时长">
+        <span :style="{ color: isDurationValid ? '#67c23a' : '#f56c6c', fontSize: '16px' }">
+          {{ durationHours }} 小时（{{ durationMinutes }} 分钟）
+        </span>
+        <span v-if="!isDurationValid" style="color: #f56c6c; margin-left: 8px">
+          （最低 {{ minBookingMinutes }} 分钟）
+        </span>
+      </el-form-item>
+      <el-form-item v-if="form.timeSlotIds.length" label="已选时段">
+        <div style="color: #409eff">已自动选择 {{ form.timeSlotIds.length }} 个时段</div>
       </el-form-item>
 
       <el-form-item v-if="loggedIn" label="储值余额">
@@ -193,7 +285,7 @@ async function submit() {
         <div v-if="preview" style="color: #999; font-size: 12px">本次需扣 {{ preview.durationHours }} 小时，请选择剩余时长足够的计时卡</div>
       </el-form-item>
 
-      <el-button type="primary" style="width: 100%" :loading="submitting" @click="submit">提交订单</el-button>
+      <el-button type="primary" style="width: 100%" :loading="submitting" :disabled="!isDurationValid" @click="submit">提交订单</el-button>
     </el-form>
   </div>
 </template>

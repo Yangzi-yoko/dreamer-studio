@@ -11,6 +11,7 @@ const id = route.params.id as string | undefined;
 const form = reactive({
   name: '', address: '', description: '', images: '',
   weekdayPriceYuan: 0, weekendPriceYuan: 0, holidayPriceYuan: 0, depositYuan: 0,
+  minBookingMinutes: 30,
   enabled: true, sort: 0,
 });
 
@@ -21,12 +22,17 @@ onMounted(async () => {
     if (data) Object.assign(form, {
       name: data.name, address: data.address, description: data.description, images: data.images,
       weekdayPriceYuan: data.weekdayPrice, weekendPriceYuan: data.weekendPrice, holidayPriceYuan: data.holidayPrice,
-      depositYuan: data.deposit, enabled: data.enabled, sort: data.sort,
+      depositYuan: data.deposit, minBookingMinutes: data.minBookingMinutes || 30,
+      enabled: data.enabled, sort: data.sort,
     });
   }
 });
 
 async function submit() {
+  if (form.minBookingMinutes < 30) {
+    ElMessage.warning('最低预约时长不能少于30分钟');
+    return;
+  }
   if (id && id !== 'new') {
     await rentalApi.updateStudio(Number(id), form);
   } else {
@@ -49,6 +55,10 @@ async function submit() {
       <el-form-item label="周末价(元)"><el-input-number v-model="form.weekendPriceYuan" :min="0" /></el-form-item>
       <el-form-item label="节假日价(元)"><el-input-number v-model="form.holidayPriceYuan" :min="0" /></el-form-item>
       <el-form-item label="押金(元)"><el-input-number v-model="form.depositYuan" :min="0" /></el-form-item>
+      <el-form-item label="最低预约时长">
+        <el-input-number v-model="form.minBookingMinutes" :min="30" :step="30" />
+        <span style="margin-left: 8px; color: #999">分钟（{{ form.minBookingMinutes / 60 }} 小时）</span>
+      </el-form-item>
       <el-form-item label="排序"><el-input-number v-model="form.sort" /></el-form-item>
       <el-form-item label="上架"><el-switch v-model="form.enabled" /></el-form-item>
       <el-button type="primary" @click="submit">保存</el-button>

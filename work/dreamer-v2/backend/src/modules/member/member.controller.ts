@@ -1,3 +1,4 @@
+import { BusinessException } from '../../common/exceptions/business.exception';
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../system/permissions.guard';
@@ -33,4 +34,13 @@ export class MemberController {
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: SaveMemberDto) {
     return this.memberService.update(id, dto);
   }
+  @Get('search')
+  @Permissions('member:list')
+  search(@Query('keyword') keyword: string) {
+    if (!keyword || keyword.trim().length === 0) {
+      throw new BusinessException('搜索关键词不能为空', 40000);
+    }
+    return this.memberService.search(keyword.trim());
+  }
+
 }

@@ -22,6 +22,8 @@ export const api = {
 
   memberPoints: () => request.get<any, any>('/member/points/me'),
   memberWallet: () => request.get<any, any>('/member/wallet/me'),
+  memberRecharge: (data: any) => request.post<any, any>('/member/wallet/recharge', data),
+  memberRechargeRules: () => request.get<any, any>('/member/wallet/me/rules'),
   signinStatus: () => request.get<any, any>('/member/signin/status'),
   signinCheckin: () => request.post<any, any>('/member/signin/checkin', {}),
   mySigninLogs: () => request.get<any, any>('/member/signin/me'),

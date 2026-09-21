@@ -37,6 +37,9 @@ export class MemberLevelService extends BaseService<MemberLevel> {
       minOrders: l.minOrders,
       enabled: l.enabled,
       sort: l.sort,
+      icon: l.icon,
+      color: l.color,
+      discount: l.discount,
       createdAt: l.createdAt,
     };
   }

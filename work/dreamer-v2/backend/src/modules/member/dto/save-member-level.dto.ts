@@ -20,4 +20,17 @@ export class SaveMemberLevelDto {
   @IsOptional()
   @IsInt()
   sort?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  icon?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(16)
+  color?: string;
+
+  @IsOptional()
+  discount?: number;
 }

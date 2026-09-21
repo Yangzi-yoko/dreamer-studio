@@ -93,6 +93,18 @@ export class MemberService extends BaseService<Member> {
     return this.toPublic(await this.repo.save(member));
   }
 
+  async search(keyword: string): Promise<any[]> {
+    const qb = this.repo.createQueryBuilder('m')
+      .leftJoinAndSelect('m.tags', 'tag')
+      .where('m.phone LIKE :kw OR m.username LIKE :kw OR m.nickname LIKE :kw OR m.id = :id')
+      .setParameter('kw', '%' + keyword + '%')
+      .setParameter('id', /^\d+$/.test(keyword) ? parseInt(keyword) : -1)
+      .orderBy('m.id', 'ASC')
+      .limit(20);
+    const list = await qb.getMany();
+    return list.map((m) => this.toPublic(m));
+  }
+
   private toPublic(m: Member): any {
     return {
       id: m.id,

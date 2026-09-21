@@ -12,6 +12,7 @@ import { RentalModule } from './modules/rental/rental.module';
 import { MemberModule } from './modules/member/member.module';
 import { MemberAuthModule } from './modules/member-auth/member-auth.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { FinanceModule } from './modules/finance/finance.module';
 import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { UploadModule } from './modules/upload/upload.module';
     MemberModule,
     MemberAuthModule,
     DashboardModule,
+    FinanceModule,
     UploadModule,
   ],
   controllers: [AppController],
