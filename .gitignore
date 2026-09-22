@@ -27,3 +27,8 @@ Thumbs.db
 # Runtime
 *.pid
 *.seed
+deploy/mysql-data/
+deploy/mysql-data/
+
+# MySQL data
+deploy/mysql-data/
